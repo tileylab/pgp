@@ -1,5 +1,6 @@
 # tileylab/pgp
 
+<!--
 [![Open in GitHub Codespaces](https://img.shields.io/badge/Open_In_GitHub_Codespaces-black?labelColor=grey&logo=github)](https://github.com/codespaces/new/tileylab/pgp)
 [![GitHub Actions CI Status](https://github.com/tileylab/pgp/actions/workflows/nf-test.yml/badge.svg)](https://github.com/tileylab/pgp/actions/workflows/nf-test.yml)
 [![GitHub Actions Linting Status](https://github.com/tileylab/pgp/actions/workflows/linting.yml/badge.svg)](https://github.com/tileylab/pgp/actions/workflows/linting.yml)[![Cite with Zenodo](http://img.shields.io/badge/DOI-10.5281/zenodo.XXXXXXX-1073c8?labelColor=000000)](https://doi.org/10.5281/zenodo.XXXXXXX)
@@ -11,63 +12,59 @@
 [![run with docker](https://img.shields.io/badge/run%20with-docker-0db7ed?labelColor=000000&logo=docker)](https://www.docker.com/)
 [![run with singularity](https://img.shields.io/badge/run%20with-singularity-1d355c.svg?labelColor=000000)](https://sylabs.io/docs/)
 [![Launch on Seqera Platform](https://img.shields.io/badge/Launch%20%F0%9F%9A%80-Seqera%20Platform-%234256e7)](https://cloud.seqera.io/launch?pipeline=https://github.com/tileylab/pgp)
-
+-->
 ## Introduction
 
-**tileylab/pgp** is a bioinformatics pipeline that ...
+>[!WARNING]
+> This project is not intended for use yet. I am migrating it over from a basic diploid genotype caller workflow and it will take time to iron out the issues.
 
-<!-- TODO nf-core:
-   Complete this sentence with a 2-3 sentence summary of what types of data the pipeline ingests, a brief overview of the
-   major pipeline sections and the types of output it produces. You're giving an overview to someone new
-   to nf-core here, in 15-20 seconds. For an example, see https://github.com/nf-core/rnaseq/blob/master/README.md#introduction
--->
+**tileylab/pgp** is a referenced-based genotyping pipeline. A user provides a reference genome and samplesheet of paired-end Illumina reads. Reads are mapped to the reference with BWA and genotypes called with GATK. Some read quality statisitics are reported along the way and basic hard-filtering performed at the end, but users need to check that filtering is sufficient and appropriate. Candidate variants will eventually be genotyped again under a suite of polyploid models to find a high-confidence set.
 
-<!-- TODO nf-core: Include a figure that guides the user through the major workflow steps. Many nf-core
-     workflows use the "tube map" design for that. See https://nf-co.re/docs/guidelines/graphic_design/workflow_diagrams#examples for examples.   -->
-<!-- TODO nf-core: Fill in short bullet-pointed list of the default steps in the pipeline -->1. Read QC ([`FastQC`](https://www.bioinformatics.babraham.ac.uk/projects/fastqc/))2. Present QC for raw reads ([`MultiQC`](http://multiqc.info/))
+### Some simplifying assumtions
+1. Only one read pair per individual are allowed
+   * Sometimes multiple libraries are sequenced for the same individual, which requires assigning different read groups then merging bams after alignment with BWA. This scenario is highly unlikely for small genomes and not accounted for here. Technical replicates of the same library should be able to be concatendated prior to genotyping without incident.
+2. There are no intervals
+   * Intervals can be defined for large genomes, these would be specific known regions of the reference genome with some biologial relevance, such as individual chromosomes. These intervals are used to *scatter-gather* genotyping operations such that each chromosome is an independent compute job. One could define mulitple intervals on a genome comprised of a single haploid chromosome, but the computational benefits deiminish with many small intervals as opposed to a few large ones. Namely, this creates a lot of extra IO and extra work on recombining the resulting *vcfs* into a single genome-wide *vcf*. Thus, intervals are ignored in favor of not spinning up many trivial compute requests.
+
+### An important note
+Some filtering of the multisample vcf is done based on the GATK best practices. This might not always be a good idea, so the vcfs at various stages are provided. Some additional hard filtering can be done based on depth and missing data cutoffs provided in the config, but this is a bit subjective and may require data exploration and judgement calls if losing many samples or important samples. Thus, the goal of this pipeline is to get the computational load of genotyping done and dealing with all of the GATK steps in a containerized envrionment. Some additional bespoke software for poylploid genotyping have also been containerized to ease implementation barriers. Some care in the evaluation of results on a case-by-case basis is needed though.
+
+
+Development of **tileylab/pgp** borrowed heavily from [sarek](https://github.com/nf-core/sarek) to learn how to finesse various nf-core modules. Many of the GATK modules were copied over to `modules/local` and modified for narrower purposes.
 
 ## Usage
-
-> [!NOTE]
-> If you are new to Nextflow and nf-core, please refer to [this page](https://nf-co.re/docs/usage/installation) on how to set-up Nextflow. Make sure to [test your setup](https://nf-co.re/docs/usage/introduction#how-to-run-a-pipeline) with `-profile test` before running the workflow on actual data.
-
-<!-- TODO nf-core: Describe the minimum required steps to execute the pipeline, e.g. how to prepare samplesheets.
-     Explain what rows and columns represent. For instance (please edit as appropriate):
-
-First, prepare a samplesheet with your input data that looks as follows:
+The input data is a comma-separated sample sheet that looks as follows:
 
 `samplesheet.csv`:
 
 ```csv
 sample,fastq_1,fastq_2
-CONTROL_REP1,AEG588A1_S1_L002_R1_001.fastq.gz,AEG588A1_S1_L002_R2_001.fastq.gz
+SRR1574573,pgp_data/fastq/SRR1574573_1.fastq.gz,pgp_data/fastq/SRR1574573_2.fastq.gz
+SRR1574576,pgp_data/fastq/SRR1574576_1.fastq.gz,pgp_data/fastq/SRR1574576_2.fastq.gz
+SRR30888765,pgp_data/fastq/SRR30888765_1.fastq.gz,pgp_data/fastq/SRR30888765_2.fastq.gz
+SRR31075530,pgp_data/fastq/SRR31075530_1.fastq.gz,pgp_data/fastq/SRR31075530_2.fastq.gz
+SRR31075531,pgp_data/fastq/SRR31075531_1.fastq.gz,pgp_data/fastq/SRR31075531_2.fastq.gz
+SRR31075532,pgp_data/fastq/SRR31075532_1.fastq.gz,pgp_data/fastq/SRR31075532_2.fastq.gz
 ```
+Relative paths are acceptable too provided the root is the nextflow launch directory. Here is a real example where the sample sheet is in `data` and the reads are in `data/fastq`
 
-Each row represents a fastq file (single-end) or a pair of fastq files (paired end).
 
--->
-
-Now, you can run the pipeline using:
-
-<!-- TODO nf-core: update the following command to include all required parameters for a minimal example -->
-
+A reference genome is expected. This is for reference alignment and genotyping. An interval file is also needed for GATK. The parameters can be defined from the command line with `reference` and `intervals`, respectively. Here is an example:
 ```bash
-nextflow run tileylab/pgp \
-   -profile <docker/singularity/.../institute> \
-   --input samplesheet.csv \
-   --outdir <OUTDIR>
+nextflow run pgp --input pgp_data/samplesheet.csv --outdir pgp_result --intervals pgp_data/ref/intervals.list --reference pgp_data/ref/ref.fa --phix pgp_data/db/bbduk/phix174_ill.ref.fa -profile docker
 ```
+The reference fasta file is also has a default in the config and json as `data/ref/ref.fa` but this can be overwritten at the command line if need be. Similar to the samplesheet and fastq availability, one might be able to provide a relative path or need to provide a full path depending on the resource.
 
-> [!WARNING]
-> Please provide pipeline parameters via the CLI or Nextflow `-params-file` option. Custom config files including those provided by the `-c` Nextflow option can be used to provide any configuration _**except for parameters**_; see [docs](https://nf-co.re/docs/usage/getting_started/configuration#custom-configuration-files).
+A script for preparing the *intervals* file is available at `bin/prepare_intervals.py`. It might be automated in the pipeline to create the intervals file from the reference genome, but for now it is simply an isolated step the user needs to do and think about.
+
+Some notable options have been pre-configure in `conf\modules.config`:
+ * Only properly paired reads with a mapping score of at least 20 are retained for genotyping with '-b -q 20 -f 2' -F 4' applied by samtools view
+ * Some cpu allocations need to be changed here rather than editing the profiles in the module main.nf scripts because the linting will complain
+ * HaplotypeCaller from GATK runs in GVCF mode. This would need to be changed to *BP_RESOLUTION* if genotype information for all sites, such as differentiating between invariant and data-deficient, is needed.
 
 ## Credits
 
 tileylab/pgp was originally written by George P. Tiley.
-
-We thank the following people for their extensive assistance in the development of this pipeline:
-
-<!-- TODO nf-core: If applicable, make list of people who have also contributed -->
 
 ## Contributions and Support
 

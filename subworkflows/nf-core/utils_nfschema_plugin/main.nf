@@ -2,7 +2,7 @@
 // Subworkflow that uses the nf-schema plugin to validate parameters and render the parameter summary
 //
 
-include { paramsSummaryLog   } from 'plugin/nf-schema'
+include { paramsSummaryMap   } from 'plugin/nf-schema'
 include { validateParameters } from 'plugin/nf-schema'
 include { paramsHelp         } from 'plugin/nf-schema'
 
@@ -53,7 +53,25 @@ workflow UTILS_NFSCHEMA_PLUGIN {
         summary_options << [parametersSchema: parameters_schema]
     }
     log.info before_text
-    log.info paramsSummaryLog(summary_options, input_workflow)
+    def summary_params = paramsSummaryMap(input_workflow, summary_options)
+    def summary_builder = new StringBuilder()
+    summary_params
+        .keySet()
+        .each { group ->
+            def group_params = summary_params.get(group)
+            if (group_params) {
+                summary_builder << "${group}:\n"
+                group_params
+                    .keySet()
+                    .sort()
+                    .each { param ->
+                        def value = group_params.get(param)
+                        summary_builder << "  ${param}: ${value ?: 'N/A'}\n"
+                    }
+                summary_builder << "\n"
+            }
+        }
+    log.info summary_builder.toString().trim()
     log.info after_text
 
     //

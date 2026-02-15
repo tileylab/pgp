@@ -10,6 +10,28 @@ include { paramsSummaryMultiqc   } from '../subworkflows/nf-core/utils_nfcore_pi
 include { softwareVersionsToYAML } from '../subworkflows/nf-core/utils_nfcore_pipeline'
 include { methodsDescriptionText } from '../subworkflows/local/utils_nfcore_pgp_pipeline'
 
+// Modules added from nf-core
+include { BBMAP_BBDUK } from '../modules/nf-core/bbmap/bbduk/main'
+include { BWA_INDEX } from '../modules/nf-core/bwa/index/main'
+include { BWA_MEM } from '../modules/nf-core/bwa/mem/main' 
+include { FASTP } from '../modules/nf-core/fastp/main'
+
+include { PICARD_MARKDUPLICATES } from '../modules/nf-core/picard/markduplicates/main'
+
+include { GATK4_CREATESEQUENCEDICTIONARY } from '../modules/nf-core/gatk4/createsequencedictionary/main'
+include { GATK4_GENOMICSDBIMPORT } from '../modules/nf-core/gatk4/genomicsdbimport/main'
+include { GATK4_GENOTYPEGVCFS } from '../modules/nf-core/gatk4/genotypegvcfs/main'
+include { GATK4_HAPLOTYPECALLER } from '../modules/nf-core/gatk4/haplotypecaller/main'
+include { GATK4_SELECTVARIANTS } from '../modules/nf-core/gatk4/selectvariants/main'
+include { GATK4_VARIANTFILTRATION } from '../modules/nf-core/gatk4/variantfiltration/main'
+
+include { SAMTOOLS_FAIDX } from '../modules/nf-core/samtools/faidx/main'
+include { SAMTOOLS_INDEX } from '../modules/nf-core/samtools/index/main'
+include { SAMTOOLS_VIEW } from '../modules/nf-core/samtools/view/main'
+
+// Subworkflows added from nf-core
+include { BAM_STATS_SAMTOOLS } from '../subworkflows/nf-core/bam_stats_samtools/main'
+
 /*
 ~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
     RUN MAIN WORKFLOW
