@@ -49,6 +49,26 @@
             "fa_icon": "fas fa-dna",
             "description": "Reference genome related files and options required for the workflow.",
             "properties": {
+                "reference": {
+                    "type": "string",
+                    "format": "file-path",
+                    "exists": true,
+                    "mimetype": "text/plain",
+                    "pattern": "^\\S+\\.fa(sta)?(\\.gz)?$",
+                    "description": "Path to FASTA genome file.",
+                    "help_text": "This is the main reference genome file in FASTA format. This parameter bypasses other nf-core reference genome options",
+                    "fa_icon": "far fa-file-code"
+                },
+                "intervals": {
+                    "type": "string",
+                    "format": "file-path",
+                    "exists": true,
+                    "mimetype": "text/plain",
+                    "pattern": "^\\S+\\.(txt)?(list)?$",
+                    "description": "Path to intervals for reference genome",
+                    "help_text": "This parameter is needed. A interval file can be prepared in advance with bin/prepare_intervals.py",
+                    "fa_icon": "far fa-file-code"
+                },
                 "genome": {
                     "type": "string",
                     "description": "Name of iGenomes reference.",

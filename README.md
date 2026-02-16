@@ -38,15 +38,12 @@ The input data is a comma-separated sample sheet that looks as follows:
 `samplesheet.csv`:
 
 ```csv
-sample,fastq_1,fastq_2
-SRR1574573,pgp_data/fastq/SRR1574573_1.fastq.gz,pgp_data/fastq/SRR1574573_2.fastq.gz
-SRR1574576,pgp_data/fastq/SRR1574576_1.fastq.gz,pgp_data/fastq/SRR1574576_2.fastq.gz
-SRR30888765,pgp_data/fastq/SRR30888765_1.fastq.gz,pgp_data/fastq/SRR30888765_2.fastq.gz
-SRR31075530,pgp_data/fastq/SRR31075530_1.fastq.gz,pgp_data/fastq/SRR31075530_2.fastq.gz
-SRR31075531,pgp_data/fastq/SRR31075531_1.fastq.gz,pgp_data/fastq/SRR31075531_2.fastq.gz
-SRR31075532,pgp_data/fastq/SRR31075532_1.fastq.gz,pgp_data/fastq/SRR31075532_2.fastq.gz
+sample,fastq_1,fastq_2,species,ploidy
+SRR19908723,data/SRR19908723.R1.fastq.gz,data/SRR19908723.R2.fastq.gz,Vdarrowii,2
+SRR19908722,data/SRR19908722.R1.fastq.gz,data/SRR19908722.R2.fastq.gz,Vdarrowii,2
+SRR19908705,data/SRR19908705.R1.fastq.gz,data/SRR19908705.R2.fastq.gz,Vdarrowii,2
 ```
-Relative paths are acceptable too provided the root is the nextflow launch directory. Here is a real example where the sample sheet is in `data` and the reads are in `data/fastq`
+Relative paths are acceptable too provided the root is the nextflow launch directory. Here is a real example where the sample sheet and the reads are in `root/data`
 
 
 A reference genome is expected. This is for reference alignment and genotyping. An interval file is also needed for GATK. The parameters can be defined from the command line with `reference` and `intervals`, respectively. Here is an example:

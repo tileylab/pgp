@@ -14,7 +14,7 @@ include { methodsDescriptionText } from '../subworkflows/local/utils_nfcore_pgp_
 include { BBMAP_BBDUK } from '../modules/nf-core/bbmap/bbduk/main'
 include { BWA_INDEX } from '../modules/nf-core/bwa/index/main'
 include { BWA_MEM } from '../modules/nf-core/bwa/mem/main' 
-include { FASTP } from '../modules/nf-core/fastp/main'
+include { FASTP } from '../modules/local/fastp/main'
 
 include { PICARD_MARKDUPLICATES } from '../modules/nf-core/picard/markduplicates/main'
 
@@ -87,7 +87,7 @@ workflow PGP {
     contamination_file = channel.fromPath("${projectDir}/assets/phix174_ill.ref.fa", checkIfExists: true)
     BBMAP_BBDUK (
         fastp_reads,
-        contamination_file
+        contamination_file.first()
     )
     ch_versions = ch_versions.mix(BBMAP_BBDUK.out.versions.first())
     ch_multiqc_files = ch_multiqc_files.mix(BBMAP_BBDUK.out.log.collect{it[1]})
@@ -98,13 +98,13 @@ workflow PGP {
     
     //first need to create a channel with meta map connecting reference name with reference genom fasta
     ch_reference = channel.fromPath(params.reference)
-        map{reference -> tuple(reference.simpleName, reference)}
+        .map { reference -> tuple(reference.simpleName, reference) }
     //ch_reference.view()
    
     BWA_INDEX (
        ch_reference 
     )
-    ch_versions = ch_versions.mix(BWA_INDEX.out.versions.first())
+    ch_versions = ch_versions.mix(BWA_INDEX.out.versions_bwa.first())
 
     //
     // Module: Run bwa_mem
@@ -139,6 +139,16 @@ Report some statistics on the reads mapping
     ch_bam_bai = SAMTOOLS_INDEX.out.bai.join(bwa_bams).map{meta, bai, bam -> [meta, bam, bai]}
     //ch_bam_bai.view()
 
+    // Create indexed reference genome (needed for SAMTOOLS_VIEW and downstream GATK)
+    SAMTOOLS_FAIDX (
+        ch_reference,
+        false
+    )
+    reference_faidx = SAMTOOLS_FAIDX.out.fai.first()
+    ch_versions = ch_versions.mix(SAMTOOLS_FAIDX.out.versions_samtools.first())
+    ch_reference_fasta_fai = ch_reference.join(SAMTOOLS_FAIDX.out.fai).map { meta, fasta, fai -> [ meta, fasta, fai ] }
+    ch_reference_fai = ch_reference.join(SAMTOOLS_FAIDX.out.fai).map { meta, fasta, fai -> [ meta, fai ] }
+
     //
     // Subworkflow: bam_stats_samtools
     // collects the stats, flagstats, and idxstats all in one go
@@ -164,7 +174,8 @@ Clearing out some junk should ease the computation a little too, which does cost
     // Filter bams to include only properly paired mapping q20 reads
     SAMTOOLS_VIEW (
         ch_bam_bai,
-        ch_reference.first(),
+        ch_reference_fasta_fai.first(),
+        [],
         []
     )
     ch_q20reads = SAMTOOLS_VIEW.out.bam
@@ -187,22 +198,16 @@ NOTE: Not bothering with splitting on intervals since the microbial genomes are 
     )
     reference_dictionary = GATK4_CREATESEQUENCEDICTIONARY.out.dict.first()
     ch_versions = ch_versions.mix(GATK4_CREATESEQUENCEDICTIONARY.out.versions_gatk4.first())
+    ch_reference_dict = ch_reference.join(GATK4_CREATESEQUENCEDICTIONARY.out.dict).map { meta, fasta, dict -> [ meta, dict ] }
     //reference_dictionary.view()
 
-    // Create indexed reference genome
-    SAMTOOLS_FAIDX (
-        ch_reference,
-        [ [ id:'no_fai' ], [] ]
-    )
-    reference_faidx = SAMTOOLS_FAIDX.out.fai.first()
-    ch_versions = ch_versions.mix(SAMTOOLS_FAIDX.out.versions_samtools.first())
     //reference_faidx.view()
 
     //Mark duplicates since a PCR is used in library prep
     PICARD_MARKDUPLICATES (
         ch_q20reads,
         ch_reference.first(),
-        reference_faidx
+        reference_faidx.first()
     )
     ch_versions = ch_versions.mix(PICARD_MARKDUPLICATES.out.versions_picard.first())
     ch_bam_bai_marked = PICARD_MARKDUPLICATES.out.bam.join(PICARD_MARKDUPLICATES.out.bai).map{meta, bam, bai -> [meta, bam, bai]}
@@ -270,10 +275,7 @@ NOTE: Not bothering with splitting on intervals since the microbial genomes are 
     */
 
     SELECT_ALL (
-        multisample_vcf_tbi,
-        ch_reference.first(),
-        reference_faidx,
-        reference_dictionary
+        multisample_vcf_tbi
     )
     ch_versions = ch_versions.mix(SELECT_ALL.out.versions_gatk4.first())
     selectall_vcf_tbi = SELECT_ALL.out.vcf.join(SELECT_ALL.out.tbi).map{
@@ -283,9 +285,9 @@ NOTE: Not bothering with splitting on intervals since the microbial genomes are 
 
     GATK4_VARIANTFILTRATION (
         selectall_vcf_tbi,
-        ch_reference.first(),
-        reference_faidx,
-        reference_dictionary
+        ch_reference,
+        ch_reference_fai,
+        ch_reference_dict
     )
     ch_versions = ch_versions.mix(GATK4_VARIANTFILTRATION.out.versions_gatk4.first())
     annotated_vcf_tbi = GATK4_VARIANTFILTRATION.out.vcf.join(GATK4_VARIANTFILTRATION.out.tbi).map{
@@ -294,10 +296,7 @@ NOTE: Not bothering with splitting on intervals since the microbial genomes are 
     //annotated_vcf_tbi.view()
 
     SELECT_PASS (
-        annotated_vcf_tbi,
-        ch_reference.first(),
-        reference_faidx,
-        reference_dictionary
+        annotated_vcf_tbi
     )
     ch_versions = ch_versions.mix(SELECT_PASS.out.versions_gatk4.first())
     pass_vcf_tbi = SELECT_PASS.out.vcf.join(SELECT_PASS.out.tbi).map{
@@ -306,10 +305,7 @@ NOTE: Not bothering with splitting on intervals since the microbial genomes are 
     //pass_vcf_tbi.view()
 
     SELECT_BIPASS (
-        pass_vcf_tbi,
-        ch_reference.first(),
-        reference_faidx,
-        reference_dictionary
+        pass_vcf_tbi
     )
     ch_versions = ch_versions.mix(SELECT_BIPASS.out.versions_gatk4.first())
     bipass_vcf_tbi = SELECT_BIPASS.out.vcf.join(SELECT_BIPASS.out.tbi).map{
@@ -337,7 +333,8 @@ NOTE: Not bothering with splitting on intervals since the microbial genomes are 
             "${process}:\n${tool_versions.join('\n')}"
         }
 
-    softwareVersionsToYAML(ch_versions.mix(topic_versions.versions_file))
+    def ch_versions_files = ch_versions.filter { it instanceof Path }
+    softwareVersionsToYAML(ch_versions_files.mix(topic_versions.versions_file))
         .mix(topic_versions_string)
         .collectFile(
             storeDir: "${params.outdir}/pipeline_info",

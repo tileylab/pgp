@@ -53,7 +53,7 @@ workflow UTILS_NFSCHEMA_PLUGIN {
         summary_options << [parametersSchema: parameters_schema]
     }
     log.info before_text
-    def summary_params = paramsSummaryMap(input_workflow, summary_options)
+    def summary_params = paramsSummaryMap(summary_options, input_workflow)
     def summary_builder = new StringBuilder()
     summary_params
         .keySet()
