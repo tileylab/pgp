@@ -1,0 +1,5 @@
+Sample	Top overrepresented sequence	Sum of remaining overrepresented sequences
+sample1_1	1.0	99.0
+sample1_2	1.0	99.0
+sample2_1	1.2	98.8
+sample2_2	1.2	98.8

@@ -1,0 +1,275 @@
+<!--
+  ~ Copyright 2013-2024, Seqera Labs
+  ~
+  ~ Licensed under the Apache License, Version 2.0 (the "License");
+  ~ you may not use this file except in compliance with the License.
+  ~ You may obtain a copy of the License at
+  ~
+  ~     http://www.apache.org/licenses/LICENSE-2.0
+  ~
+  ~ Unless required by applicable law or agreed to in writing, software
+  ~ distributed under the License is distributed on an "AS IS" BASIS,
+  ~ WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.
+  ~ See the License for the specific language governing permissions and
+  ~ limitations under the License.
+  -->
+<html>
+<head>
+<meta name="viewport" content="width=device-width, user-scalable=no, initial-scale=1, maximum-scale=1">
+</head>
+<body>
+<pre class="mermaid" style="text-align: center;">
+%%{
+  init: {
+    'theme': 'base',
+    'themeVariables': {
+      'primaryColor': '#B6ECE2',
+      'primaryTextColor': '#160F26',
+      'primaryBorderColor': '#065647',
+      'lineColor': '#545555',
+      'clusterBkg': '#BABCBD22',
+      'clusterBorder': '#DDDEDE',
+      'fontFamily': 'arial'
+    }
+  }
+}%%
+flowchart TB
+    subgraph " "
+    v2["Channel.fromList"]
+    v15["adapter_fasta"]
+    v16["discard_trimmed_pass"]
+    v17["save_trimmed_fail"]
+    v18["save_merged"]
+    v28["Channel.fromPath"]
+    v35["Channel.fromPath"]
+    v42["sort_bam"]
+    v56["get_sizes"]
+    v82["qname"]
+    v83["index_format"]
+    v114["Channel.fromPath"]
+    v151[" "]
+    v162["Channel.of"]
+    v166["Channel.fromPath"]
+    v169["ch_workflow_summary"]
+    v173["ch_methods_description"]
+    v180["replace_names"]
+    v181["sample_names"]
+    end
+    subgraph "TILEYLAB_PGP [TILEYLAB_PGP]"
+    subgraph "TILEYLAB_PGP:PGP [PGP]"
+    v9(["FASTQC"])
+    v19(["FASTP"])
+    v30(["BBMAP_BBDUK"])
+    v37(["BWA_INDEX"])
+    v43(["BWA_MEM"])
+    v49(["SAMTOOLS_INDEX"])
+    v57(["SAMTOOLS_FAIDX"])
+    subgraph "TILEYLAB_PGP:PGP:BAM_STATS_SAMTOOLS [BAM_STATS_SAMTOOLS]"
+    v69(["SAMTOOLS_STATS"])
+    v71(["SAMTOOLS_FLAGSTAT"])
+    v73(["SAMTOOLS_IDXSTATS"])
+    end
+    v84(["SAMTOOLS_VIEW"])
+    v94(["GATK4_CREATESEQUENCEDICTIONARY"])
+    v102(["PICARD_MARKDUPLICATES"])
+    v110(["GATK4_HAPLOTYPECALLER"])
+    v120(["GATK4_GENOMICSDBIMPORT"])
+    v125(["GATK4_GENOTYPEGVCFS"])
+    v130(["SELECT_ALL"])
+    v135(["GATK4_VARIANTFILTRATION"])
+    v140(["SELECT_PASS"])
+    v145(["SELECT_BIPASS"])
+    v182(["MULTIQC"])
+    v11(( ))
+    v29(( ))
+    v36(( ))
+    v40(( ))
+    v54(( ))
+    v61(( ))
+    v95(( ))
+    v107(( ))
+    v115(( ))
+    v123(( ))
+    v128(( ))
+    v133(( ))
+    v138(( ))
+    v143(( ))
+    v148(( ))
+    v177(( ))
+    v178(( ))
+    v179(( ))
+    v186(( ))
+    end
+    end
+    subgraph " "
+    v10[" "]
+    v20[" "]
+    v21[" "]
+    v22[" "]
+    v23[" "]
+    v44[" "]
+    v45[" "]
+    v46[" "]
+    v50[" "]
+    v51[" "]
+    v58[" "]
+    v59[" "]
+    v60[" "]
+    v70[" "]
+    v72[" "]
+    v74[" "]
+    v85[" "]
+    v86[" "]
+    v87[" "]
+    v88[" "]
+    v89[" "]
+    v90[" "]
+    v91[" "]
+    v103[" "]
+    v104[" "]
+    v111[" "]
+    v150["bipass_vcf_tbi"]
+    v183[" "]
+    v184[" "]
+    v185[" "]
+    v188[" "]
+    end
+    subgraph "PIPELINE_INITIALISATION [PIPELINE_INITIALISATION]"
+    v3(( ))
+    end
+    subgraph "PIPELINE_COMPLETION [PIPELINE_COMPLETION]"
+    v187(( ))
+    end
+    v2 --> v3
+    v3 --> v9
+    v9 --> v10
+    v9 --> v11
+    v15 --> v19
+    v16 --> v19
+    v17 --> v19
+    v18 --> v19
+    v3 --> v19
+    v19 --> v30
+    v19 --> v23
+    v19 --> v22
+    v19 --> v21
+    v19 --> v20
+    v19 --> v11
+    v28 --> v29
+    v29 --> v30
+    v30 --> v43
+    v30 --> v11
+    v35 --> v36
+    v36 --> v37
+    v37 --> v11
+    v37 --> v40
+    v42 --> v43
+    v36 --> v43
+    v40 --> v43
+    v43 --> v49
+    v43 --> v46
+    v43 --> v45
+    v43 --> v44
+    v43 --> v11
+    v43 --> v54
+    v49 --> v51
+    v49 --> v50
+    v49 --> v11
+    v49 --> v54
+    v56 --> v57
+    v36 --> v57
+    v57 --> v60
+    v57 --> v59
+    v57 --> v58
+    v57 --> v11
+    v57 --> v36
+    v57 --> v61
+    v36 --> v69
+    v54 --> v69
+    v69 --> v70
+    v69 --> v11
+    v54 --> v71
+    v71 --> v72
+    v71 --> v11
+    v54 --> v73
+    v73 --> v74
+    v73 --> v11
+    v82 --> v84
+    v83 --> v84
+    v36 --> v84
+    v54 --> v84
+    v84 --> v102
+    v84 --> v91
+    v84 --> v90
+    v84 --> v89
+    v84 --> v88
+    v84 --> v87
+    v84 --> v86
+    v84 --> v85
+    v84 --> v11
+    v36 --> v94
+    v94 --> v11
+    v94 --> v36
+    v94 --> v95
+    v36 --> v102
+    v61 --> v102
+    v102 --> v104
+    v102 --> v103
+    v102 --> v11
+    v102 --> v107
+    v36 --> v110
+    v61 --> v110
+    v95 --> v110
+    v107 --> v110
+    v110 --> v111
+    v110 --> v11
+    v110 --> v115
+    v114 --> v120
+    v115 --> v120
+    v120 --> v11
+    v120 --> v123
+    v36 --> v125
+    v61 --> v125
+    v95 --> v125
+    v123 --> v125
+    v125 --> v11
+    v125 --> v128
+    v128 --> v130
+    v130 --> v11
+    v130 --> v133
+    v36 --> v135
+    v133 --> v135
+    v135 --> v11
+    v135 --> v138
+    v138 --> v140
+    v140 --> v11
+    v140 --> v143
+    v143 --> v145
+    v145 --> v11
+    v145 --> v148
+    v148 --> v150
+    v151 --> v11
+    v162 --> v11
+    v166 --> v177
+    v169 --> v11
+    v173 --> v11
+    v180 --> v182
+    v181 --> v182
+    v11 --> v182
+    v177 --> v182
+    v178 --> v182
+    v179 --> v182
+    v182 --> v185
+    v182 --> v184
+    v182 --> v183
+    v182 --> v186
+    v187 --> v188
+    v186 --> v187
+
+</pre>
+<script type="module">
+  import mermaid from 'https://cdn.jsdelivr.net/npm/mermaid@11/dist/mermaid.esm.min.mjs';
+  mermaid.initialize({ startOnLoad: true, maxTextSize: Number.MAX_SAFE_INTEGER, maxEdges: Number.MAX_SAFE_INTEGER });
+</script>
+</body>
+</html>

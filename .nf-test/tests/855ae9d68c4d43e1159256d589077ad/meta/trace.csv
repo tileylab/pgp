@@ -1,0 +1,2 @@
+task_id	hash	native_id	name	status	exit	submit	duration	realtime	%cpu	peak_rss	peak_vmem	rchar	wchar
+1	1c/df195c	15891	GATK4_SELECTVARIANTS (test)	COMPLETED	0	2026-03-20 08:36:13.136	15.1s	5s	192.9%	262 MB	9.1 GB	95.4 MB	698.8 KB

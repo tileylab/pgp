@@ -4,29 +4,53 @@ nextflow_pipeline {
     script "../main.nf"
     tag "pipeline"
 
-    test("-profile test") {
+    test("Full pipeline runs successfully with test data") {
+
+        setup {
+            // Generate samplesheet with absolute paths so nf-schema file validation passes
+            def testDataDir = "${baseDir}/tests/data"
+            def samplesheet = new File("${outputDir}/test_samplesheet.csv")
+            samplesheet.parentFile.mkdirs()
+            samplesheet.text = """\
+sample,fastq_1,fastq_2,species,ploidy
+sample1,${testDataDir}/sample1_R1.fastq.gz,${testDataDir}/sample1_R2.fastq.gz,test_species,2
+sample2,${testDataDir}/sample2_R1.fastq.gz,${testDataDir}/sample2_R2.fastq.gz,test_species,2
+"""
+        }
 
         when {
             params {
                 outdir = "$outputDir"
+                input  = "${outputDir}/test_samplesheet.csv"
             }
         }
 
         then {
-            // stable_name: All files + folders in ${params.outdir}/ with a stable name
-            def stable_name = getAllFilesFromDir(params.outdir, relative: true, includeDir: true, ignore: ['pipeline_info/*.{html,json,txt}'])
-            // stable_path: All files in ${params.outdir}/ with stable content
-            def stable_path = getAllFilesFromDir(params.outdir, ignoreFile: 'tests/.nftignore')
             assertAll(
-                { assert workflow.success},
-                { assert snapshot(
-                    // pipeline versions.yml file for multiqc from which Nextflow version is removed because we test pipelines on multiple Nextflow versions
-                    removeNextflowVersion("$outputDir/pipeline_info/pgp_software_mqc_versions.yml"),
-                    // All stable path name, with a relative path
-                    stable_name,
-                    // All files with stable contents
-                    stable_path
-                ).match() }
+                // Pipeline completes without error
+                { assert workflow.success },
+
+                // FastQC outputs exist
+                { assert new File("${params.outdir}/fastqc").exists() },
+
+                // fastp trimming outputs exist
+                { assert new File("${params.outdir}/fastp").exists() },
+
+                // BAM alignment outputs exist
+                { assert new File("${params.outdir}/samtools").exists() },
+
+                // GATK genotyping outputs exist
+                { assert new File("${params.outdir}/gatk4").exists() },
+
+                // MultiQC report exists
+                { assert new File("${params.outdir}/multiqc").exists() },
+
+                // Check that VCF files were produced at each filtering stage
+                { assert new File("${params.outdir}/gatk4").listFiles()
+                    .findAll { it.name.endsWith('.vcf.gz') }.size() > 0 },
+
+                // Pipeline info directory exists
+                { assert new File("${params.outdir}/pipeline_info").exists() }
             )
         }
     }

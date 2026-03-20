@@ -1,0 +1,9 @@
+Sample	samtools_stats-error_rate	samtools_stats-non_primary_alignments	samtools_stats-reads_mapped	samtools_stats-reads_mapped_percent	samtools_stats-reads_properly_paired_percent	samtools_stats-reads_MQ0_percent	samtools_stats-raw_total_sequences	samtools_stats-insert_size_average	samtools_flagstat-flagstat_total	samtools_flagstat-mapped_passed	samtools_flagstat-mapped_passed_pct	fastp-pct_duplication	fastp-after_filtering_q30_rate	fastp-after_filtering_q30_bases	fastp-filtering_result_passed_filter_reads	fastp-after_filtering_gc_content	fastp-pct_surviving	fastp-pct_adapter	fastp-before_filtering_read1_mean_length	fastp-before_filtering_read2_mean_length	bbduk-Total_Removed_bases_percent	bbduk-Total_Removed_bases	bbduk-Total_Removed_reads_percent	bbduk-Total_Removed_reads	bbduk-Input_reads	fastqc-percent_duplicates	fastqc-percent_gc	fastqc-avg_sequence_length	fastqc-median_sequence_length	fastqc-percent_fails	fastqc-total_sequences
+sample1	0.1033333	0.0	0.001	100.0	100.0	0.0	0.001	300.0	0.001	0.001	100.0	35.0	52.316700000000004	0.078475	0.001	49.44	100.0	0.0	150.0	150.0											
+sample1_1																										35.0	48.0	150.0	150	10.0	0.0005
+sample1_2																										35.0	49.0	150.0	150	10.0	0.0005
+sample1_R1																					0.0	0.0	0.0	0.0	0.001						
+sample2	0.11399999999999999	0.0	0.001	100.0	100.0	0.0	0.001	300.0	0.001	0.001	100.0	31.6	52.209300000000006	0.078314	0.001	49.4213	100.0	0.0	150.0	150.0											
+sample2_1																										31.599999999999994	48.0	150.0	150	20.0	0.0005
+sample2_2																										31.599999999999994	50.0	150.0	150	20.0	0.0005
+sample2_R1																					0.0	0.0	0.0	0.0	0.001						
