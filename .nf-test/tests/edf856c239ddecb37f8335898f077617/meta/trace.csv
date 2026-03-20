@@ -1,2 +1,2 @@
 task_id	hash	native_id	name	status	exit	submit	duration	realtime	%cpu	peak_rss	peak_vmem	rchar	wchar
-1	74/067680	16104	GATK4_HAPLOTYPECALLER (test_bam)	COMPLETED	0	2026-03-20 08:37:38.288	18.1s	10.3s	210.4%	646.2 MB	14.2 GB	96.4 MB	708.7 KB
+1	10/b1c81e	20723	GATK4_HAPLOTYPECALLER (test_bam)	COMPLETED	0	2026-03-20 10:04:49.483	19.6s	11.2s	197.5%	731 MB	14.2 GB	96.4 MB	708.7 KB

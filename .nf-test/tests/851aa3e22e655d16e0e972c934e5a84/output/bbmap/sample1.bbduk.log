@@ -3,22 +3,22 @@ Executing jgi.BBDuk [-Xmx4g, in1=sample1_R1.fastp.fastq.gz, in2=sample1_R2.fastp
 Version 39.18
 
 Set threads to 4
-Allocating kmer table: 	0.040 seconds.
+Allocating kmer table: 	0.044 seconds.
 Initial:
-Memory: max=4294m, total=4294m, free=4263m, used=31m
+Memory: max=4294m, total=4294m, free=4264m, used=30m
 
-Added 5360 kmers; time: 	0.031 seconds.
-Memory: max=4294m, total=4294m, free=4253m, used=41m
+Added 5360 kmers; time: 	0.030 seconds.
+Memory: max=4294m, total=4294m, free=4254m, used=40m
 
 Input is being processed as paired
-Started output streams:	0.133 seconds.
-Processing time:   		0.083 seconds.
+Started output streams:	0.132 seconds.
+Processing time:   		0.069 seconds.
 
 Input:                  	1000 reads 		150000 bases.
 Contaminants:           	0 reads (0.00%) 	0 bases (0.00%)
 Total Removed:          	0 reads (0.00%) 	0 bases (0.00%)
 Result:                 	1000 reads (100.00%) 	150000 bases (100.00%)
 
-Time:                         	0.250 seconds.
-Reads Processed:        1000 	4.00k reads/sec
-Bases Processed:        150k 	0.60m bases/sec
+Time:                         	0.232 seconds.
+Reads Processed:        1000 	4.30k reads/sec
+Bases Processed:        150k 	0.65m bases/sec

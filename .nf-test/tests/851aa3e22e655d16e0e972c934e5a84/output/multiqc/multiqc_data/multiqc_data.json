@@ -3,36 +3,36 @@
     "report_data_sources": {
         "Samtools": {
             "stats": {
-                "sample1": "/Users/georgetiley/github/pgp/.nf-test/tests/851aa3e22e655d16e0e972c934e5a84/work/d5/d23f90a0abe56684f117844f532815/14/sample1.stats",
-                "sample2": "/Users/georgetiley/github/pgp/.nf-test/tests/851aa3e22e655d16e0e972c934e5a84/work/d5/d23f90a0abe56684f117844f532815/13/sample2.stats"
+                "sample1": "/Users/georgetiley/github/pgp/.nf-test/tests/851aa3e22e655d16e0e972c934e5a84/work/fa/f6bd0d47a3d04fe6e5ec5adaf2df54/16/sample1.stats",
+                "sample2": "/Users/georgetiley/github/pgp/.nf-test/tests/851aa3e22e655d16e0e972c934e5a84/work/fa/f6bd0d47a3d04fe6e5ec5adaf2df54/15/sample2.stats"
             },
             "flagstat": {
-                "sample1": "/Users/georgetiley/github/pgp/.nf-test/tests/851aa3e22e655d16e0e972c934e5a84/work/d5/d23f90a0abe56684f117844f532815/12/sample1.flagstat",
-                "sample2": "/Users/georgetiley/github/pgp/.nf-test/tests/851aa3e22e655d16e0e972c934e5a84/work/d5/d23f90a0abe56684f117844f532815/11/sample2.flagstat"
+                "sample1": "/Users/georgetiley/github/pgp/.nf-test/tests/851aa3e22e655d16e0e972c934e5a84/work/fa/f6bd0d47a3d04fe6e5ec5adaf2df54/12/sample1.flagstat",
+                "sample2": "/Users/georgetiley/github/pgp/.nf-test/tests/851aa3e22e655d16e0e972c934e5a84/work/fa/f6bd0d47a3d04fe6e5ec5adaf2df54/11/sample2.flagstat"
             },
             "idxstats": {
-                "sample1": "/Users/georgetiley/github/pgp/.nf-test/tests/851aa3e22e655d16e0e972c934e5a84/work/d5/d23f90a0abe56684f117844f532815/16/sample1.idxstats",
-                "sample2": "/Users/georgetiley/github/pgp/.nf-test/tests/851aa3e22e655d16e0e972c934e5a84/work/d5/d23f90a0abe56684f117844f532815/15/sample2.idxstats"
+                "sample1": "/Users/georgetiley/github/pgp/.nf-test/tests/851aa3e22e655d16e0e972c934e5a84/work/fa/f6bd0d47a3d04fe6e5ec5adaf2df54/14/sample1.idxstats",
+                "sample2": "/Users/georgetiley/github/pgp/.nf-test/tests/851aa3e22e655d16e0e972c934e5a84/work/fa/f6bd0d47a3d04fe6e5ec5adaf2df54/13/sample2.idxstats"
             }
         },
         "BBDuk": {
             "all_sections": {
-                "sample1_R1": "/Users/georgetiley/github/pgp/.nf-test/tests/851aa3e22e655d16e0e972c934e5a84/work/d5/d23f90a0abe56684f117844f532815/10/sample1.bbduk.log",
-                "sample2_R1": "/Users/georgetiley/github/pgp/.nf-test/tests/851aa3e22e655d16e0e972c934e5a84/work/d5/d23f90a0abe56684f117844f532815/9/sample2.bbduk.log"
+                "sample1_R1": "/Users/georgetiley/github/pgp/.nf-test/tests/851aa3e22e655d16e0e972c934e5a84/work/fa/f6bd0d47a3d04fe6e5ec5adaf2df54/10/sample1.bbduk.log",
+                "sample2_R1": "/Users/georgetiley/github/pgp/.nf-test/tests/851aa3e22e655d16e0e972c934e5a84/work/fa/f6bd0d47a3d04fe6e5ec5adaf2df54/9/sample2.bbduk.log"
             }
         },
         "fastp": {
             "all_sections": {
-                "sample1": "/Users/georgetiley/github/pgp/.nf-test/tests/851aa3e22e655d16e0e972c934e5a84/work/d5/d23f90a0abe56684f117844f532815/3/sample1.fastp.json",
-                "sample2": "/Users/georgetiley/github/pgp/.nf-test/tests/851aa3e22e655d16e0e972c934e5a84/work/d5/d23f90a0abe56684f117844f532815/4/sample2.fastp.json"
+                "sample1": "/Users/georgetiley/github/pgp/.nf-test/tests/851aa3e22e655d16e0e972c934e5a84/work/fa/f6bd0d47a3d04fe6e5ec5adaf2df54/4/sample1.fastp.json",
+                "sample2": "/Users/georgetiley/github/pgp/.nf-test/tests/851aa3e22e655d16e0e972c934e5a84/work/fa/f6bd0d47a3d04fe6e5ec5adaf2df54/3/sample2.fastp.json"
             }
         },
         "FastQC": {
             "all_sections": {
-                "sample1_1": "/Users/georgetiley/github/pgp/.nf-test/tests/851aa3e22e655d16e0e972c934e5a84/work/d5/d23f90a0abe56684f117844f532815/7/sample1_1_fastqc.zip",
-                "sample1_2": "/Users/georgetiley/github/pgp/.nf-test/tests/851aa3e22e655d16e0e972c934e5a84/work/d5/d23f90a0abe56684f117844f532815/8/sample1_2_fastqc.zip",
-                "sample2_1": "/Users/georgetiley/github/pgp/.nf-test/tests/851aa3e22e655d16e0e972c934e5a84/work/d5/d23f90a0abe56684f117844f532815/5/sample2_1_fastqc.zip",
-                "sample2_2": "/Users/georgetiley/github/pgp/.nf-test/tests/851aa3e22e655d16e0e972c934e5a84/work/d5/d23f90a0abe56684f117844f532815/6/sample2_2_fastqc.zip"
+                "sample1_1": "/Users/georgetiley/github/pgp/.nf-test/tests/851aa3e22e655d16e0e972c934e5a84/work/fa/f6bd0d47a3d04fe6e5ec5adaf2df54/7/sample1_1_fastqc.zip",
+                "sample1_2": "/Users/georgetiley/github/pgp/.nf-test/tests/851aa3e22e655d16e0e972c934e5a84/work/fa/f6bd0d47a3d04fe6e5ec5adaf2df54/8/sample1_2_fastqc.zip",
+                "sample2_1": "/Users/georgetiley/github/pgp/.nf-test/tests/851aa3e22e655d16e0e972c934e5a84/work/fa/f6bd0d47a3d04fe6e5ec5adaf2df54/5/sample2_1_fastqc.zip",
+                "sample2_2": "/Users/georgetiley/github/pgp/.nf-test/tests/851aa3e22e655d16e0e972c934e5a84/work/fa/f6bd0d47a3d04fe6e5ec5adaf2df54/6/sample2_2_fastqc.zip"
             }
         }
     },
@@ -745,7 +745,7 @@
             }
         }
     },
-    "report_creation_date": "2026-03-20, 06:24 UTC",
+    "report_creation_date": "2026-03-20, 13:53 UTC",
     "report_plot_data": {
         "samtools_alignment_plot": {
             "id": "samtools_alignment_plot",
@@ -35207,11 +35207,11 @@
     "config_subtitle": null,
     "config_title": null,
     "config_version": "1.32",
-    "config_output_dir": "/Users/georgetiley/github/pgp/.nf-test/tests/851aa3e22e655d16e0e972c934e5a84/work/d5/d23f90a0abe56684f117844f532815",
+    "config_output_dir": "/Users/georgetiley/github/pgp/.nf-test/tests/851aa3e22e655d16e0e972c934e5a84/work/fa/f6bd0d47a3d04fe6e5ec5adaf2df54",
     "config_sample_names_rename": [],
     "config_sample_names_rename_buttons": [],
     "config_analysis_dir_abs": [
-        "/Users/georgetiley/github/pgp/.nf-test/tests/851aa3e22e655d16e0e972c934e5a84/work/d5/d23f90a0abe56684f117844f532815"
+        "/Users/georgetiley/github/pgp/.nf-test/tests/851aa3e22e655d16e0e972c934e5a84/work/fa/f6bd0d47a3d04fe6e5ec5adaf2df54"
     ],
     "report_saved_raw_data": {
         "multiqc_samtools_stats": {

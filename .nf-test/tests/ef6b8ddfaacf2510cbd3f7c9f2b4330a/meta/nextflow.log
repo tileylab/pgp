@@ -1,102 +1,102 @@
-Mar-20 02:26:26.614 [main] DEBUG nextflow.cli.Launcher - $> nextflow -quiet -log /Users/georgetiley/github/pgp/.nf-test/tests/ef6b8ddfaacf2510cbd3f7c9f2b4330a/meta/nextflow.log run /Users/georgetiley/github/pgp/.nf-test-ef6b8ddfaacf2510cbd3f7c9f2b4330a.nf -c /Users/georgetiley/github/pgp/nextflow.config -c /Users/georgetiley/github/pgp/tests/nextflow.config -params-file /Users/georgetiley/github/pgp/.nf-test/tests/ef6b8ddfaacf2510cbd3f7c9f2b4330a/meta/params.json -ansi-log false -profile docker -with-trace /Users/georgetiley/github/pgp/.nf-test/tests/ef6b8ddfaacf2510cbd3f7c9f2b4330a/meta/trace.csv -w /Users/georgetiley/github/pgp/.nf-test/tests/ef6b8ddfaacf2510cbd3f7c9f2b4330a/work -stub
-Mar-20 02:26:26.647 [main] INFO  nextflow.cli.CmdRun - N E X T F L O W  ~  version 25.10.4
-Mar-20 02:26:26.657 [main] DEBUG nextflow.plugin.PluginsFacade - Setting up plugin manager > mode=prod; embedded=false; plugins-dir=/Users/georgetiley/.nextflow/plugins; core-plugins: nf-amazon@3.4.4,nf-azure@1.20.2,nf-cloudcache@0.5.0,nf-codecommit@0.5.0,nf-console@1.3.0,nf-google@1.23.5,nf-k8s@1.2.2,nf-tower@1.17.5,nf-wave@1.16.1
-Mar-20 02:26:26.676 [main] INFO  o.pf4j.DefaultPluginStatusProvider - Enabled plugins: []
-Mar-20 02:26:26.676 [main] INFO  o.pf4j.DefaultPluginStatusProvider - Disabled plugins: []
-Mar-20 02:26:26.678 [main] INFO  org.pf4j.DefaultPluginManager - PF4J version 3.12.0 in 'deployment' mode
-Mar-20 02:26:26.686 [main] DEBUG nextflow.util.RetryConfig - Missing nextflow session - using default retry config
-Mar-20 02:26:26.751 [main] INFO  org.pf4j.AbstractPluginManager - No plugins
-Mar-20 02:26:26.768 [main] DEBUG nextflow.config.ConfigBuilder - Found config base: /Users/georgetiley/github/pgp/nextflow.config
-Mar-20 02:26:26.770 [main] DEBUG nextflow.config.ConfigBuilder - User config file: /Users/georgetiley/github/pgp/nextflow.config
-Mar-20 02:26:26.770 [main] DEBUG nextflow.config.ConfigBuilder - User config file: /Users/georgetiley/github/pgp/tests/nextflow.config
-Mar-20 02:26:26.770 [main] DEBUG nextflow.config.ConfigBuilder - Parsing config file: /Users/georgetiley/github/pgp/nextflow.config
-Mar-20 02:26:26.771 [main] DEBUG nextflow.config.ConfigBuilder - Parsing config file: /Users/georgetiley/github/pgp/nextflow.config
-Mar-20 02:26:26.771 [main] DEBUG nextflow.config.ConfigBuilder - Parsing config file: /Users/georgetiley/github/pgp/tests/nextflow.config
-Mar-20 02:26:26.782 [main] DEBUG nextflow.config.ConfigBuilder - Applying config profile: `docker`
-Mar-20 02:26:27.677 [main] DEBUG nextflow.config.ConfigBuilder - Applying config profile: `docker`
-Mar-20 02:26:27.901 [main] DEBUG nextflow.config.ConfigBuilder - Applying config profile: `docker`
-Mar-20 02:26:27.908 [main] DEBUG nextflow.config.ConfigBuilder - Available config profiles: [bih, cfc_dev, uzl_omics, ifb_core, embl_hd, denbi_qbic, alice, mjolnir_globe, uppmax, giga, incliva, ilifu, ki_luria, uge, icr_alma, rosalind_uge, lugh, mccleary, unibe_ibu, vai, czbiohub_aws, jax, roslin, iris, tes, scw, unc_longleaf, tigem, tubingen_apg, apollo, ipop_up, vsc_calcua, pdc_kth, ceci_nic5, ccga_cau, humantechnopole, stjude, daisybio, eddie, medair, biowulf, apptainer, bi, bigpurple, adcra, cedars, pawsey_setonix, vsc_kul_uhasselt, pawsey_nimbus, rki, ucl_myriad, utd_ganymede, charliecloud, fred_hutch, seattlechildrens, icr_davros, ceres, munin, rosalind, hasta, cfc, emulate_amd64, uzh, shu_bmrc, ebi_codon_slurm, ebc, ccga_dx, crick, ku_sund_danhead, marvin, lrz_cm4, shifter, biohpc_gen, mana, mamba, york_viking, unc_lccc, wehi, awsbatch, wustl_htcf, arcc, ceci_dragon2, imperial, maestro, software_license, cannon, genotoul, nci_gadi, abims, eva_grace, janelia, nu_genomics, googlebatch, oist, sahmri, kaust, alliance_canada, arm64, mpcdf, leicester, vsc_ugent, create, sage, cambridge, jex, podman, ebi_codon, cheaha, xanadu, nyu_hpc, test, marjorie, computerome, ucd_sonic, gpu, seg_globe, mssm, sanger, dkfz, bluebear, pasteur, einstein, ethz_euler, m3c, test_full, imb, ucl_cscluster, tuos_stanage, azurebatch, seadragon, crukmi, csiro_petrichor, qmul_apocrita, wave, docker, engaging, gis, hypatia, psmn, eva, unity, cropdiversityhpc, nygc, fgcz, conda, crg, singularity, mpcdf_viper, dirac, self_hosted_runner, tufts, uw_hyak_pedslabs, binac2, debug, hki_genie, genouest, cbe, unsw_katana, utd_juno, phoenix, seawulf, uod_hpc, fub_curta, lovelace, uct_hpc, aws_tower, fsu_draco]
-Mar-20 02:26:27.927 [main] DEBUG nextflow.plugin.PluginsFacade - Plugins declared=[nf-schema@2.5.1]
-Mar-20 02:26:27.928 [main] DEBUG nextflow.plugin.PluginsFacade - Plugins default=[]
-Mar-20 02:26:27.928 [main] DEBUG nextflow.plugin.PluginsFacade - Plugins resolved requirement=[nf-schema@2.5.1]
-Mar-20 02:26:28.285 [main] DEBUG n.plugin.HttpPluginRepository - Registry request: https://registry.nextflow.io/api/v1/plugins/dependencies?plugins=nf-schema%402.5.1&nextflowVersion=25.10.4
+Mar-20 10:02:53.101 [main] DEBUG nextflow.cli.Launcher - $> nextflow -quiet -log /Users/georgetiley/github/pgp/.nf-test/tests/ef6b8ddfaacf2510cbd3f7c9f2b4330a/meta/nextflow.log run /Users/georgetiley/github/pgp/.nf-test-ef6b8ddfaacf2510cbd3f7c9f2b4330a.nf -c /Users/georgetiley/github/pgp/nextflow.config -c /Users/georgetiley/github/pgp/tests/nextflow.config -params-file /Users/georgetiley/github/pgp/.nf-test/tests/ef6b8ddfaacf2510cbd3f7c9f2b4330a/meta/params.json -ansi-log false -profile test,docker -with-trace /Users/georgetiley/github/pgp/.nf-test/tests/ef6b8ddfaacf2510cbd3f7c9f2b4330a/meta/trace.csv -w /Users/georgetiley/github/pgp/.nf-test/tests/ef6b8ddfaacf2510cbd3f7c9f2b4330a/work -stub
+Mar-20 10:02:53.134 [main] INFO  nextflow.cli.CmdRun - N E X T F L O W  ~  version 25.10.4
+Mar-20 10:02:53.145 [main] DEBUG nextflow.plugin.PluginsFacade - Setting up plugin manager > mode=prod; embedded=false; plugins-dir=/Users/georgetiley/.nextflow/plugins; core-plugins: nf-amazon@3.4.4,nf-azure@1.20.2,nf-cloudcache@0.5.0,nf-codecommit@0.5.0,nf-console@1.3.0,nf-google@1.23.5,nf-k8s@1.2.2,nf-tower@1.17.5,nf-wave@1.16.1
+Mar-20 10:02:53.163 [main] INFO  o.pf4j.DefaultPluginStatusProvider - Enabled plugins: []
+Mar-20 10:02:53.164 [main] INFO  o.pf4j.DefaultPluginStatusProvider - Disabled plugins: []
+Mar-20 10:02:53.165 [main] INFO  org.pf4j.DefaultPluginManager - PF4J version 3.12.0 in 'deployment' mode
+Mar-20 10:02:53.173 [main] DEBUG nextflow.util.RetryConfig - Missing nextflow session - using default retry config
+Mar-20 10:02:53.239 [main] INFO  org.pf4j.AbstractPluginManager - No plugins
+Mar-20 10:02:53.258 [main] DEBUG nextflow.config.ConfigBuilder - Found config base: /Users/georgetiley/github/pgp/nextflow.config
+Mar-20 10:02:53.260 [main] DEBUG nextflow.config.ConfigBuilder - User config file: /Users/georgetiley/github/pgp/nextflow.config
+Mar-20 10:02:53.260 [main] DEBUG nextflow.config.ConfigBuilder - User config file: /Users/georgetiley/github/pgp/tests/nextflow.config
+Mar-20 10:02:53.260 [main] DEBUG nextflow.config.ConfigBuilder - Parsing config file: /Users/georgetiley/github/pgp/nextflow.config
+Mar-20 10:02:53.261 [main] DEBUG nextflow.config.ConfigBuilder - Parsing config file: /Users/georgetiley/github/pgp/nextflow.config
+Mar-20 10:02:53.261 [main] DEBUG nextflow.config.ConfigBuilder - Parsing config file: /Users/georgetiley/github/pgp/tests/nextflow.config
+Mar-20 10:02:53.274 [main] DEBUG nextflow.config.ConfigBuilder - Applying config profile: `test,docker`
+Mar-20 10:02:54.077 [main] DEBUG nextflow.config.ConfigBuilder - Applying config profile: `test,docker`
+Mar-20 10:02:54.219 [main] DEBUG nextflow.config.ConfigBuilder - Applying config profile: `test,docker`
+Mar-20 10:02:54.227 [main] DEBUG nextflow.config.ConfigBuilder - Available config profiles: [bih, cfc_dev, uzl_omics, ifb_core, embl_hd, denbi_qbic, alice, mjolnir_globe, uppmax, giga, incliva, ilifu, ki_luria, uge, icr_alma, rosalind_uge, lugh, mccleary, unibe_ibu, vai, czbiohub_aws, jax, roslin, iris, tes, scw, unc_longleaf, tigem, tubingen_apg, apollo, ipop_up, vsc_calcua, pdc_kth, ceci_nic5, ccga_cau, humantechnopole, stjude, daisybio, eddie, medair, biowulf, mahuika, apptainer, bi, bigpurple, adcra, cedars, pawsey_setonix, vsc_kul_uhasselt, pawsey_nimbus, rki, ucl_myriad, utd_ganymede, charliecloud, fred_hutch, seattlechildrens, icr_davros, ceres, munin, rosalind, hasta, cfc, emulate_amd64, uzh, shu_bmrc, ebi_codon_slurm, ebc, ccga_dx, crick, ku_sund_danhead, marvin, lrz_cm4, shifter, biohpc_gen, mana, mamba, york_viking, unc_lccc, wehi, awsbatch, wustl_htcf, arcc, ceci_dragon2, imperial, maestro, software_license, cannon, genotoul, nci_gadi, abims, eva_grace, janelia, nu_genomics, googlebatch, oist, sahmri, kaust, alliance_canada, arm64, mpcdf, leicester, vsc_ugent, create, sage, cambridge, jex, podman, ebi_codon, cheaha, xanadu, nyu_hpc, test, marjorie, computerome, ucd_sonic, gpu, seg_globe, mssm, sanger, dkfz, bluebear, pasteur, einstein, ethz_euler, m3c, imb, ucl_cscluster, tuos_stanage, azurebatch, seadragon, crukmi, csiro_petrichor, qmul_apocrita, wave, docker, engaging, gis, hypatia, psmn, eva, unity, cropdiversityhpc, nygc, fgcz, conda, crg, singularity, mpcdf_viper, dirac, self_hosted_runner, tufts, uw_hyak_pedslabs, binac2, debug, hki_genie, genouest, cbe, unsw_katana, utd_juno, phoenix, seawulf, uod_hpc, fub_curta, lovelace, uct_hpc, aws_tower, fsu_draco]
+Mar-20 10:02:54.243 [main] DEBUG nextflow.plugin.PluginsFacade - Plugins declared=[nf-schema@2.5.1]
+Mar-20 10:02:54.244 [main] DEBUG nextflow.plugin.PluginsFacade - Plugins default=[]
+Mar-20 10:02:54.244 [main] DEBUG nextflow.plugin.PluginsFacade - Plugins resolved requirement=[nf-schema@2.5.1]
+Mar-20 10:02:54.648 [main] DEBUG n.plugin.HttpPluginRepository - Registry request: https://registry.nextflow.io/api/v1/plugins/dependencies?plugins=nf-schema%402.5.1&nextflowVersion=25.10.4
 - code: 200
 - body: {"plugins":[{"id":"nf-schema","releases":[{"version":"2.5.1","url":"https://registry.nextflow.io/api/v1/plugins/nf-schema/2.5.1/download/nf-schema-2.5.1.zip","date":"2025-09-02T14:48:39.714892Z","sha512sum":"82c9c17a9f77319386e670e7b52cf79b067320001f083ccdfec77dada9fd53499506200fd10b493cf8f6fc0420f42e2314481c353ca14b3a92f354bf07ad5c13","requires":">=25.04.0","dependsOn":[],"status":"PUBLISHED"}],"projectUrl":"https://github.com/nextflow-io/nf-schema","provider":"nextflow-io"}]}
-Mar-20 02:26:28.318 [main] DEBUG nextflow.plugin.PluginUpdater - Installing plugin nf-schema version: 2.5.1
-Mar-20 02:26:28.334 [main] INFO  org.pf4j.AbstractPluginManager - Plugin 'nf-schema@2.5.1' resolved
-Mar-20 02:26:28.334 [main] INFO  org.pf4j.AbstractPluginManager - Start plugin 'nf-schema@2.5.1'
-Mar-20 02:26:28.338 [main] DEBUG nextflow.plugin.BasePlugin - Plugin started nf-schema@2.5.1
-Mar-20 02:26:28.342 [main] DEBUG n.secret.LocalSecretsProvider - Secrets store: /Users/georgetiley/.nextflow/secrets/store.json
-Mar-20 02:26:28.343 [main] DEBUG nextflow.secret.SecretsLoader - Discovered secrets providers: [nextflow.secret.LocalSecretsProvider@2964511] - activable => nextflow.secret.LocalSecretsProvider@2964511
-Mar-20 02:26:28.344 [main] DEBUG nextflow.cli.CmdRun - Applied DSL=2 by global default
-Mar-20 02:26:28.351 [main] INFO  nextflow.cli.CmdRun - Launching `/Users/georgetiley/github/pgp/.nf-test-ef6b8ddfaacf2510cbd3f7c9f2b4330a.nf` [lonely_leibniz] DSL2 - revision: 1eec44dfb9
-Mar-20 02:26:28.378 [main] DEBUG nextflow.Session - Session UUID: f297cad0-cbcb-4de6-8fdc-424bb5aee064
-Mar-20 02:26:28.378 [main] DEBUG nextflow.Session - Run name: lonely_leibniz
-Mar-20 02:26:28.378 [main] DEBUG nextflow.Session - Executor pool size: 8
-Mar-20 02:26:28.383 [main] DEBUG nextflow.file.FilePorter - File porter settings maxRetries=3; maxTransfers=50; pollTimeout=null
-Mar-20 02:26:28.385 [main] DEBUG nextflow.util.ThreadPoolBuilder - Creating thread pool 'FileTransfer' minSize=10; maxSize=24; workQueue=LinkedBlockingQueue[-1]; allowCoreThreadTimeout=false
-Mar-20 02:26:28.395 [main] DEBUG nextflow.cli.CmdRun - 
+Mar-20 10:02:54.677 [main] DEBUG nextflow.plugin.PluginUpdater - Installing plugin nf-schema version: 2.5.1
+Mar-20 10:02:54.685 [main] INFO  org.pf4j.AbstractPluginManager - Plugin 'nf-schema@2.5.1' resolved
+Mar-20 10:02:54.685 [main] INFO  org.pf4j.AbstractPluginManager - Start plugin 'nf-schema@2.5.1'
+Mar-20 10:02:54.689 [main] DEBUG nextflow.plugin.BasePlugin - Plugin started nf-schema@2.5.1
+Mar-20 10:02:54.693 [main] DEBUG n.secret.LocalSecretsProvider - Secrets store: /Users/georgetiley/.nextflow/secrets/store.json
+Mar-20 10:02:54.694 [main] DEBUG nextflow.secret.SecretsLoader - Discovered secrets providers: [nextflow.secret.LocalSecretsProvider@1d283d1] - activable => nextflow.secret.LocalSecretsProvider@1d283d1
+Mar-20 10:02:54.695 [main] DEBUG nextflow.cli.CmdRun - Applied DSL=2 by global default
+Mar-20 10:02:54.712 [main] INFO  nextflow.cli.CmdRun - Launching `/Users/georgetiley/github/pgp/.nf-test-ef6b8ddfaacf2510cbd3f7c9f2b4330a.nf` [pensive_mandelbrot] DSL2 - revision: 1eec44dfb9
+Mar-20 10:02:54.750 [main] DEBUG nextflow.Session - Session UUID: bbb90660-9e9a-44a7-90ad-3ada584b6b2d
+Mar-20 10:02:54.750 [main] DEBUG nextflow.Session - Run name: pensive_mandelbrot
+Mar-20 10:02:54.751 [main] DEBUG nextflow.Session - Executor pool size: 8
+Mar-20 10:02:54.755 [main] DEBUG nextflow.file.FilePorter - File porter settings maxRetries=3; maxTransfers=50; pollTimeout=null
+Mar-20 10:02:54.757 [main] DEBUG nextflow.util.ThreadPoolBuilder - Creating thread pool 'FileTransfer' minSize=10; maxSize=24; workQueue=LinkedBlockingQueue[-1]; allowCoreThreadTimeout=false
+Mar-20 10:02:54.767 [main] DEBUG nextflow.cli.CmdRun - 
   Version: 25.10.4 build 11173
   Created: 10-02-2026 15:17 UTC (10:17 EDT)
   System: Mac OS X 14.8.4
   Runtime: Groovy 4.0.28 on Java HotSpot(TM) 64-Bit Server VM 21.0.2+13-LTS-58
   Encoding: UTF-8 (UTF-8)
-  Process: 12658@Georges-MacBook-Pro-2.local [127.0.0.1]
-  CPUs: 8 - Mem: 16 GB (128.4 MB) - Swap: 3 GB (1021.9 MB)
-Mar-20 02:26:28.403 [main] DEBUG nextflow.Session - Work-dir: /Users/georgetiley/github/pgp/.nf-test/tests/ef6b8ddfaacf2510cbd3f7c9f2b4330a/work [Mac OS X]
-Mar-20 02:26:28.412 [main] DEBUG nextflow.executor.ExecutorFactory - Extension executors providers=[]
-Mar-20 02:26:28.417 [main] DEBUG nextflow.Session - Observer factory (v2): LinObserverFactory
-Mar-20 02:26:28.418 [main] DEBUG nextflow.Session - Observer factory (v2): DefaultObserverFactory
-Mar-20 02:26:28.425 [main] DEBUG nextflow.Session - Observer factory (v2): ValidationObserverFactory
-Mar-20 02:26:28.444 [main] DEBUG nextflow.cache.CacheFactory - Using Nextflow cache factory: nextflow.cache.DefaultCacheFactory
-Mar-20 02:26:28.449 [main] DEBUG nextflow.util.CustomThreadPool - Creating default thread pool > poolSize: 9; maxThreads: 1000
-Mar-20 02:26:28.479 [main] DEBUG nextflow.Session - Session start
-Mar-20 02:26:28.483 [main] DEBUG nextflow.trace.TraceFileObserver - Workflow started -- trace file: /Users/georgetiley/github/pgp/.nf-test/tests/ef6b8ddfaacf2510cbd3f7c9f2b4330a/meta/trace.csv
-Mar-20 02:26:28.486 [main] DEBUG n.validation.config.ValidationConfig - Set `validation.monochromeLogs` to true due to the ANSI log settings.
-Mar-20 02:26:28.487 [main] DEBUG n.validation.config.ValidationConfig - Added the following parameters to the ignored parameters: [genomes]
-Mar-20 02:26:28.488 [main] DEBUG n.validation.config.HelpConfig - Set `validation.help.enabled` to true
-Mar-20 02:26:28.488 [main] DEBUG n.validation.config.HelpConfig - Set `validation.help.showHiddenParameter` to show_hidden
-Mar-20 02:26:28.488 [main] DEBUG n.validation.config.HelpConfig - Set `validation.help.showHidden` to false (Due to --show_hidden)
-Mar-20 02:26:28.488 [main] DEBUG n.validation.config.HelpConfig - Set `validation.help.fullParameter` to help_full
-Mar-20 02:26:28.488 [main] DEBUG n.validation.config.HelpConfig - Set `validation.help.command` to nextflow run tileylab/pgp -profile <docker/singularity/.../institute> --input samplesheet.csv --outdir <OUTDIR>
-Mar-20 02:26:28.617 [main] DEBUG nextflow.script.ScriptRunner - > Launching execution
-Mar-20 02:26:28.934 [main] DEBUG n.script.dsl.ProcessConfigBuilder - Config settings `withLabel:process_medium` matches labels `process_medium` for process with name FASTP
-Mar-20 02:26:28.934 [main] DEBUG n.script.dsl.ProcessConfigBuilder - Config settings `withName:FASTP` matches process FASTP
-Mar-20 02:26:28.936 [main] DEBUG nextflow.executor.ExecutorFactory - << taskConfig executor: null
-Mar-20 02:26:28.936 [main] DEBUG nextflow.executor.ExecutorFactory - >> processorType: 'local'
-Mar-20 02:26:28.940 [main] DEBUG nextflow.executor.Executor - [warm up] executor > local
-Mar-20 02:26:28.942 [main] DEBUG n.processor.LocalPollingMonitor - Creating local task monitor for executor 'local' > cpus=8; memory=16 GB; capacity=8; pollInterval=100ms; dumpInterval=5m
-Mar-20 02:26:28.943 [main] DEBUG n.processor.TaskPollingMonitor - >>> barrier register (monitor: local)
-Mar-20 02:26:28.951 [main] DEBUG nextflow.processor.TaskProcessor - Creating process 'FASTP': maxForks=0; fair=false; array=0
-Mar-20 02:26:28.974 [main] DEBUG nextflow.Session - Config process names validation disabled as requested
-Mar-20 02:26:28.977 [main] DEBUG nextflow.Session - Igniting dataflow network (3)
-Mar-20 02:26:28.977 [main] DEBUG nextflow.processor.TaskProcessor - Starting process > FASTP
-Mar-20 02:26:28.978 [main] DEBUG nextflow.script.ScriptRunner - Parsed script files:
+  Process: 19998@Georges-MacBook-Pro-2.local [127.0.0.1]
+  CPUs: 8 - Mem: 16 GB (174.3 MB) - Swap: 3 GB (1 GB)
+Mar-20 10:02:54.775 [main] DEBUG nextflow.Session - Work-dir: /Users/georgetiley/github/pgp/.nf-test/tests/ef6b8ddfaacf2510cbd3f7c9f2b4330a/work [Mac OS X]
+Mar-20 10:02:54.784 [main] DEBUG nextflow.executor.ExecutorFactory - Extension executors providers=[]
+Mar-20 10:02:54.788 [main] DEBUG nextflow.Session - Observer factory (v2): LinObserverFactory
+Mar-20 10:02:54.790 [main] DEBUG nextflow.Session - Observer factory (v2): DefaultObserverFactory
+Mar-20 10:02:54.796 [main] DEBUG nextflow.Session - Observer factory (v2): ValidationObserverFactory
+Mar-20 10:02:54.815 [main] DEBUG nextflow.cache.CacheFactory - Using Nextflow cache factory: nextflow.cache.DefaultCacheFactory
+Mar-20 10:02:54.820 [main] DEBUG nextflow.util.CustomThreadPool - Creating default thread pool > poolSize: 9; maxThreads: 1000
+Mar-20 10:02:54.851 [main] DEBUG nextflow.Session - Session start
+Mar-20 10:02:54.855 [main] DEBUG nextflow.trace.TraceFileObserver - Workflow started -- trace file: /Users/georgetiley/github/pgp/.nf-test/tests/ef6b8ddfaacf2510cbd3f7c9f2b4330a/meta/trace.csv
+Mar-20 10:02:54.858 [main] DEBUG n.validation.config.ValidationConfig - Set `validation.monochromeLogs` to true due to the ANSI log settings.
+Mar-20 10:02:54.859 [main] DEBUG n.validation.config.ValidationConfig - Added the following parameters to the ignored parameters: []
+Mar-20 10:02:54.860 [main] DEBUG n.validation.config.HelpConfig - Set `validation.help.enabled` to true
+Mar-20 10:02:54.861 [main] DEBUG n.validation.config.HelpConfig - Set `validation.help.showHiddenParameter` to show_hidden
+Mar-20 10:02:54.861 [main] DEBUG n.validation.config.HelpConfig - Set `validation.help.showHidden` to false (Due to --show_hidden)
+Mar-20 10:02:54.861 [main] DEBUG n.validation.config.HelpConfig - Set `validation.help.fullParameter` to help_full
+Mar-20 10:02:54.861 [main] DEBUG n.validation.config.HelpConfig - Set `validation.help.command` to nextflow run tileylab/pgp -profile <docker/singularity/.../institute> --input samplesheet.csv --outdir <OUTDIR>
+Mar-20 10:02:54.977 [main] DEBUG nextflow.script.ScriptRunner - > Launching execution
+Mar-20 10:02:55.327 [main] DEBUG n.script.dsl.ProcessConfigBuilder - Config settings `withLabel:process_medium` matches labels `process_medium` for process with name FASTP
+Mar-20 10:02:55.328 [main] DEBUG n.script.dsl.ProcessConfigBuilder - Config settings `withName:FASTP` matches process FASTP
+Mar-20 10:02:55.330 [main] DEBUG nextflow.executor.ExecutorFactory - << taskConfig executor: null
+Mar-20 10:02:55.331 [main] DEBUG nextflow.executor.ExecutorFactory - >> processorType: 'local'
+Mar-20 10:02:55.335 [main] DEBUG nextflow.executor.Executor - [warm up] executor > local
+Mar-20 10:02:55.339 [main] DEBUG n.processor.LocalPollingMonitor - Creating local task monitor for executor 'local' > cpus=8; memory=16 GB; capacity=8; pollInterval=100ms; dumpInterval=5m
+Mar-20 10:02:55.340 [main] DEBUG n.processor.TaskPollingMonitor - >>> barrier register (monitor: local)
+Mar-20 10:02:55.349 [main] DEBUG nextflow.processor.TaskProcessor - Creating process 'FASTP': maxForks=0; fair=false; array=0
+Mar-20 10:02:55.378 [main] DEBUG nextflow.Session - Config process names validation disabled as requested
+Mar-20 10:02:55.382 [main] DEBUG nextflow.Session - Igniting dataflow network (3)
+Mar-20 10:02:55.382 [main] DEBUG nextflow.processor.TaskProcessor - Starting process > FASTP
+Mar-20 10:02:55.382 [main] DEBUG nextflow.script.ScriptRunner - Parsed script files:
   Script_3712f32e7773c14e: /Users/georgetiley/github/pgp/modules/local/fastp/main.nf
   Script_e4a751afed68400c: /Users/georgetiley/github/pgp/.nf-test-ef6b8ddfaacf2510cbd3f7c9f2b4330a.nf
-Mar-20 02:26:28.978 [main] DEBUG nextflow.script.ScriptRunner - > Awaiting termination 
-Mar-20 02:26:28.978 [main] DEBUG nextflow.Session - Session await
-Mar-20 02:26:29.188 [FileTransfer-1] DEBUG nextflow.file.FilePorter - Copying foreign file https://raw.githubusercontent.com/nf-core/test-datasets/modules/data/genomics/sarscov2/illumina/fastq/test_1.fastq.gz to work dir: /Users/georgetiley/github/pgp/.nf-test/tests/ef6b8ddfaacf2510cbd3f7c9f2b4330a/work/stage-f297cad0-cbcb-4de6-8fdc-424bb5aee064/12/b1e2e28c919b4089d1766096925d32/test_1.fastq.gz
-Mar-20 02:26:29.188 [FileTransfer-2] DEBUG nextflow.file.FilePorter - Copying foreign file https://raw.githubusercontent.com/nf-core/test-datasets/modules/data/genomics/sarscov2/illumina/fastq/test_2.fastq.gz to work dir: /Users/georgetiley/github/pgp/.nf-test/tests/ef6b8ddfaacf2510cbd3f7c9f2b4330a/work/stage-f297cad0-cbcb-4de6-8fdc-424bb5aee064/af/2590d94da44db893fe0ddd8ae20da8/test_2.fastq.gz
-Mar-20 02:26:29.454 [Task submitter] DEBUG n.executor.local.LocalTaskHandler - Launch cmd line: /bin/bash -ue .command.run
-Mar-20 02:26:29.455 [Task submitter] INFO  nextflow.Session - [20/4f6542] Submitted process > FASTP (test)
-Mar-20 02:26:30.624 [Task monitor] DEBUG n.processor.TaskPollingMonitor - Task completed > TaskHandler[id: 1; name: FASTP (test); status: COMPLETED; exit: 0; error: -; workDir: /Users/georgetiley/github/pgp/.nf-test/tests/ef6b8ddfaacf2510cbd3f7c9f2b4330a/work/20/4f65426269d3cfa4d60d6e978ad2a9]
-Mar-20 02:26:30.625 [Task monitor] DEBUG nextflow.util.ThreadPoolBuilder - Creating thread pool 'TaskFinalizer' minSize=10; maxSize=24; workQueue=LinkedBlockingQueue[-1]; allowCoreThreadTimeout=false
-Mar-20 02:26:30.689 [TaskFinalizer-1] DEBUG nextflow.processor.TaskProcessor - Process FASTP > Skipping output binding because one or more optional files are missing: fileoutparam<4:1>
-Mar-20 02:26:30.689 [TaskFinalizer-1] DEBUG nextflow.processor.TaskProcessor - Process FASTP > Skipping output binding because one or more optional files are missing: fileoutparam<5:1>
-Mar-20 02:26:30.692 [TaskFinalizer-1] WARN  nextflow.processor.PublishDir - Process `FASTP` publishDir path contains a variable with a null value
-Mar-20 02:26:30.694 [TaskFinalizer-1] DEBUG nextflow.util.ThreadPoolBuilder - Creating thread pool 'PublishDir' minSize=10; maxSize=24; workQueue=LinkedBlockingQueue[-1]; allowCoreThreadTimeout=false
-Mar-20 02:26:30.703 [main] DEBUG nextflow.Session - Session await > all processes finished
-Mar-20 02:26:30.723 [Task monitor] DEBUG n.processor.TaskPollingMonitor - <<< barrier arrives (monitor: local) - terminating tasks monitor poll loop
-Mar-20 02:26:30.723 [main] DEBUG nextflow.Session - Session await > all barriers passed
-Mar-20 02:26:30.724 [main] DEBUG nextflow.util.ThreadPoolManager - Thread pool 'TaskFinalizer' shutdown completed (hard=false)
-Mar-20 02:26:30.724 [main] DEBUG nextflow.util.ThreadPoolManager - Thread pool 'PublishDir' shutdown completed (hard=false)
-Mar-20 02:26:30.730 [main] DEBUG n.trace.WorkflowStatsObserver - Workflow completed > WorkflowStats[succeededCount=1; failedCount=0; ignoredCount=0; cachedCount=0; pendingCount=0; submittedCount=0; runningCount=0; retriesCount=0; abortedCount=0; succeedDuration=872ms; failedDuration=0ms; cachedDuration=0ms;loadCpus=0; loadMemory=0; peakRunning=1; peakCpus=4; peakMemory=2 GB; ]
-Mar-20 02:26:30.739 [main] DEBUG nextflow.trace.ReportObserver - Workflow completed -- rendering execution report
-Mar-20 02:26:31.298 [main] DEBUG nextflow.trace.TimelineObserver - Workflow completed -- rendering execution timeline
-Mar-20 02:26:31.358 [main] DEBUG nextflow.trace.TraceFileObserver - Workflow completed -- saving trace file
-Mar-20 02:26:31.361 [main] DEBUG nextflow.cache.CacheDB - Closing CacheDB done
-Mar-20 02:26:31.368 [main] INFO  org.pf4j.AbstractPluginManager - Stop plugin 'nf-schema@2.5.1'
-Mar-20 02:26:31.368 [main] DEBUG nextflow.plugin.BasePlugin - Plugin stopped nf-schema
-Mar-20 02:26:31.369 [main] DEBUG nextflow.util.ThreadPoolManager - Thread pool 'FileTransfer' shutdown completed (hard=false)
-Mar-20 02:26:31.369 [main] DEBUG nextflow.script.ScriptRunner - > Execution complete -- Goodbye
+Mar-20 10:02:55.382 [main] DEBUG nextflow.script.ScriptRunner - > Awaiting termination 
+Mar-20 10:02:55.382 [main] DEBUG nextflow.Session - Session await
+Mar-20 10:02:55.592 [FileTransfer-2] DEBUG nextflow.file.FilePorter - Copying foreign file https://raw.githubusercontent.com/nf-core/test-datasets/modules/data/genomics/sarscov2/illumina/fastq/test_2.fastq.gz to work dir: /Users/georgetiley/github/pgp/.nf-test/tests/ef6b8ddfaacf2510cbd3f7c9f2b4330a/work/stage-bbb90660-9e9a-44a7-90ad-3ada584b6b2d/79/a4925fb5443fd263958d23aca78e3b/test_2.fastq.gz
+Mar-20 10:02:55.592 [FileTransfer-1] DEBUG nextflow.file.FilePorter - Copying foreign file https://raw.githubusercontent.com/nf-core/test-datasets/modules/data/genomics/sarscov2/illumina/fastq/test_1.fastq.gz to work dir: /Users/georgetiley/github/pgp/.nf-test/tests/ef6b8ddfaacf2510cbd3f7c9f2b4330a/work/stage-bbb90660-9e9a-44a7-90ad-3ada584b6b2d/41/3a6159a3be361ade197aaa131c55ce/test_1.fastq.gz
+Mar-20 10:02:55.890 [Task submitter] DEBUG n.executor.local.LocalTaskHandler - Launch cmd line: /bin/bash -ue .command.run
+Mar-20 10:02:55.892 [Task submitter] INFO  nextflow.Session - [19/08069b] Submitted process > FASTP (test)
+Mar-20 10:02:56.904 [Task monitor] DEBUG n.processor.TaskPollingMonitor - Task completed > TaskHandler[id: 1; name: FASTP (test); status: COMPLETED; exit: 0; error: -; workDir: /Users/georgetiley/github/pgp/.nf-test/tests/ef6b8ddfaacf2510cbd3f7c9f2b4330a/work/19/08069b52dd45afb5141a6a3edb954c]
+Mar-20 10:02:56.905 [Task monitor] DEBUG nextflow.util.ThreadPoolBuilder - Creating thread pool 'TaskFinalizer' minSize=10; maxSize=24; workQueue=LinkedBlockingQueue[-1]; allowCoreThreadTimeout=false
+Mar-20 10:02:56.964 [TaskFinalizer-1] DEBUG nextflow.processor.TaskProcessor - Process FASTP > Skipping output binding because one or more optional files are missing: fileoutparam<4:1>
+Mar-20 10:02:56.965 [TaskFinalizer-1] DEBUG nextflow.processor.TaskProcessor - Process FASTP > Skipping output binding because one or more optional files are missing: fileoutparam<5:1>
+Mar-20 10:02:56.967 [TaskFinalizer-1] WARN  nextflow.processor.PublishDir - Process `FASTP` publishDir path contains a variable with a null value
+Mar-20 10:02:56.970 [TaskFinalizer-1] DEBUG nextflow.util.ThreadPoolBuilder - Creating thread pool 'PublishDir' minSize=10; maxSize=24; workQueue=LinkedBlockingQueue[-1]; allowCoreThreadTimeout=false
+Mar-20 10:02:56.978 [main] DEBUG nextflow.Session - Session await > all processes finished
+Mar-20 10:02:57.007 [Task monitor] DEBUG n.processor.TaskPollingMonitor - <<< barrier arrives (monitor: local) - terminating tasks monitor poll loop
+Mar-20 10:02:57.007 [main] DEBUG nextflow.Session - Session await > all barriers passed
+Mar-20 10:02:57.008 [main] DEBUG nextflow.util.ThreadPoolManager - Thread pool 'TaskFinalizer' shutdown completed (hard=false)
+Mar-20 10:02:57.008 [main] DEBUG nextflow.util.ThreadPoolManager - Thread pool 'PublishDir' shutdown completed (hard=false)
+Mar-20 10:02:57.020 [main] DEBUG n.trace.WorkflowStatsObserver - Workflow completed > WorkflowStats[succeededCount=1; failedCount=0; ignoredCount=0; cachedCount=0; pendingCount=0; submittedCount=0; runningCount=0; retriesCount=0; abortedCount=0; succeedDuration=780ms; failedDuration=0ms; cachedDuration=0ms;loadCpus=0; loadMemory=0; peakRunning=1; peakCpus=4; peakMemory=2 GB; ]
+Mar-20 10:02:57.029 [main] DEBUG nextflow.trace.ReportObserver - Workflow completed -- rendering execution report
+Mar-20 10:02:57.558 [main] DEBUG nextflow.trace.TimelineObserver - Workflow completed -- rendering execution timeline
+Mar-20 10:02:57.623 [main] DEBUG nextflow.trace.TraceFileObserver - Workflow completed -- saving trace file
+Mar-20 10:02:57.626 [main] DEBUG nextflow.cache.CacheDB - Closing CacheDB done
+Mar-20 10:02:57.632 [main] INFO  org.pf4j.AbstractPluginManager - Stop plugin 'nf-schema@2.5.1'
+Mar-20 10:02:57.632 [main] DEBUG nextflow.plugin.BasePlugin - Plugin stopped nf-schema
+Mar-20 10:02:57.632 [main] DEBUG nextflow.util.ThreadPoolManager - Thread pool 'FileTransfer' shutdown completed (hard=false)
+Mar-20 10:02:57.633 [main] DEBUG nextflow.script.ScriptRunner - > Execution complete -- Goodbye

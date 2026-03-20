@@ -907,7 +907,7 @@ Section:
 <p style="font-size:110%"><b>Generic options</b></p>
 <dl class="dl-horizontal">
     <dt>pipelines_testdata_base_path</dt><dd><samp>https://raw.githubusercontent.com/nf-core/test-datasets/refs/heads/pgp</samp></dd>
-    <dt>trace_report_suffix</dt><dd><samp>2026-03-20_02-19-55</samp></dd>
+    <dt>trace_report_suffix</dt><dd><samp>2026-03-20_09-51-11</samp></dd>
 </dl>
 <p style="font-size:110%"><b>Core Nextflow options</b></p>
 <dl class="dl-horizontal">
@@ -916,7 +916,7 @@ Section:
     <dt>launchDir</dt><dd><samp>/Users/georgetiley/github/pgp/.nf-test/tests/851aa3e22e655d16e0e972c934e5a84</samp></dd>
     <dt>profile</dt><dd><samp>test,docker</samp></dd>
     <dt>projectDir</dt><dd><samp>/Users/georgetiley/github/pgp</samp></dd>
-    <dt>runName</dt><dd><samp>wise_euler</samp></dd>
+    <dt>runName</dt><dd><samp>furious_jennings</samp></dd>
     <dt>userName</dt><dd><samp>georgetiley</samp></dd>
     <dt>workDir</dt><dd><samp>/Users/georgetiley/github/pgp/.nf-test/tests/851aa3e22e655d16e0e972c934e5a84/work</samp></dd>
 </dl>
