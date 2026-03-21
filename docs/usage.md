@@ -185,6 +185,22 @@ A pipeline might not always support every possible argument or option of a parti
 
 To learn how to provide additional arguments to a particular tool of the pipeline, please see the [customising tool arguments](https://nf-co.re/docs/usage/configuration#customising-tool-arguments) section of the nf-core website.
 
+### Skip Duplicate Marking For Targeted Libraries
+
+For assays where duplicate marking is not biologically appropriate (for example restriction-enzyme or probe-targeted sequencing), you can bypass Picard duplicate marking:
+
+```bash
+nextflow run tileylab/pgp \
+  --input ./samplesheet.csv \
+  --outdir ./results \
+  --reference ./reference.fa \
+  --intervals ./intervals.list \
+  --skip_markduplicates \
+  -profile docker
+```
+
+When `--skip_markduplicates` is enabled, the workflow sends `SAMTOOLS_VIEW`-filtered BAMs directly to HaplotypeCaller after indexing, instead of running `PICARD_MARKDUPLICATES`.
+
 ### nf-core/configs
 
 In most cases, you will only need to create a custom config as a one-off but if you and others within your organisation are likely to be running nf-core pipelines regularly and need to use the same settings regularly it may be a good idea to request that your custom config file is uploaded to the `nf-core/configs` git repository. Before you do this please can you test that the config file works with your pipeline of choice using the `-c` parameter. You can then create a pull request to the `nf-core/configs` repository with the addition of your config file, associated documentation file (see examples in [`nf-core/configs/docs`](https://github.com/nf-core/configs/tree/master/docs)), and amending [`nfcore_custom.config`](https://github.com/nf-core/configs/blob/master/nfcore_custom.config) to include your custom profile.

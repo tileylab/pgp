@@ -203,14 +203,25 @@ NOTE: Not bothering with splitting on intervals since the microbial genomes are 
 
     //reference_faidx.view()
 
-    //Mark duplicates since a PCR is used in library prep
-    PICARD_MARKDUPLICATES (
-        ch_q20reads,
-        ch_reference.first(),
-        reference_faidx.first()
-    )
-    ch_versions = ch_versions.mix(PICARD_MARKDUPLICATES.out.versions_picard.first())
-    ch_bam_bai_marked = PICARD_MARKDUPLICATES.out.bam.join(PICARD_MARKDUPLICATES.out.bai).map{meta, bam, bai -> [meta, bam, bai]}
+    if (params.skip_markduplicates) {
+        log.info 'Skipping duplicate marking: --skip_markduplicates is enabled. SAMTOOLS_VIEW-filtered BAMs will be indexed and passed directly to HaplotypeCaller.'
+        // Duplicate marking can be inappropriate for targeted/restriction-based libraries.
+        SAMTOOLS_INDEX (
+            ch_q20reads
+        )
+        ch_versions = ch_versions.mix(SAMTOOLS_INDEX.out.versions_samtools.first())
+        ch_bam_bai_marked = SAMTOOLS_INDEX.out.bai.join(ch_q20reads).map{meta, bai, bam -> [meta, bam, bai]}
+    } else {
+        log.info 'Duplicate marking is enabled. Running PICARD_MARKDUPLICATES before HaplotypeCaller.'
+        // Mark duplicates for standard random-sheared library prep.
+        PICARD_MARKDUPLICATES (
+            ch_q20reads,
+            ch_reference.first(),
+            reference_faidx.first()
+        )
+        ch_versions = ch_versions.mix(PICARD_MARKDUPLICATES.out.versions_picard.first())
+        ch_bam_bai_marked = PICARD_MARKDUPLICATES.out.bam.join(PICARD_MARKDUPLICATES.out.bai).map{meta, bam, bai -> [meta, bam, bai]}
+    }
     //ch_bam_bai_marked.view()
 
     // Genotype at individual level with gatk
