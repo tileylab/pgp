@@ -30,6 +30,7 @@ include { GATK4_VARIANTFILTRATION } from '../modules/nf-core/gatk4/variantfiltra
 
 include { SAMTOOLS_FAIDX } from '../modules/nf-core/samtools/faidx/main'
 include { SAMTOOLS_INDEX } from '../modules/nf-core/samtools/index/main'
+include { SAMTOOLS_INDEX as SAMTOOLS_INDEX_PASSDUPS } from '../modules/nf-core/samtools/index/main'
 include { SAMTOOLS_VIEW } from '../modules/nf-core/samtools/view/main'
 
 // Subworkflows added from nf-core
@@ -206,11 +207,11 @@ NOTE: Not bothering with splitting on intervals since the microbial genomes are 
     if (params.skip_markduplicates) {
         log.info 'Skipping duplicate marking: --skip_markduplicates is enabled. SAMTOOLS_VIEW-filtered BAMs will be indexed and passed directly to HaplotypeCaller.'
         // Duplicate marking can be inappropriate for targeted/restriction-based libraries.
-        SAMTOOLS_INDEX (
+        SAMTOOLS_INDEX_PASSDUPS (
             ch_q20reads
         )
-        ch_versions = ch_versions.mix(SAMTOOLS_INDEX.out.versions_samtools.first())
-        ch_bam_bai_marked = SAMTOOLS_INDEX.out.bai.join(ch_q20reads).map{meta, bai, bam -> [meta, bam, bai]}
+        ch_versions = ch_versions.mix(SAMTOOLS_INDEX_PASSDUPS.out.versions_samtools.first())
+        ch_bam_bai_marked = SAMTOOLS_INDEX_PASSDUPS.out.bai.join(ch_q20reads).map{meta, bai, bam -> [meta, bam, bai]}
     } else {
         log.info 'Duplicate marking is enabled. Running PICARD_MARKDUPLICATES before HaplotypeCaller.'
         // Mark duplicates for standard random-sheared library prep.
