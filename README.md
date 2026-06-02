@@ -33,7 +33,18 @@ Some filtering of the multisample vcf is done based on the GATK best practices. 
 Development of **tileylab/pgp** borrowed heavily from [sarek](https://github.com/nf-core/sarek) to learn how to finesse various nf-core modules. Many of the GATK modules were copied over to `modules/local` and modified for narrower purposes.
 
 ## Usage
-The input data is a comma-separated sample sheet that looks as follows:
+
+### Samplesheet
+
+The pipeline takes a comma-separated samplesheet with one row per sample and the following five columns (all required except `fastq_2`, which may be empty for single-end data):
+
+| Column    | Type    | Description                                                                                          |
+| --------- | ------- | ---------------------------------------------------------------------------------------------------- |
+| `sample`  | string  | Sample identifier. Must be unique and cannot contain spaces. Becomes the `meta.id` in the workflow.  |
+| `fastq_1` | path    | Path to gzipped FASTQ file for read 1 (`.fastq.gz` or `.fq.gz`).                                     |
+| `fastq_2` | path    | Path to gzipped FASTQ file for read 2. Leave empty for single-end libraries.                         |
+| `species` | string  | Species, population, or other grouping label. No spaces.                                             |
+| `ploidy`  | integer | Sample ploidy (positive integer). Currently informational; reserved for upcoming polyploid models.   |
 
 `samplesheet.csv`:
 
@@ -43,21 +54,59 @@ SRR19908723,data/SRR19908723.R1.fastq.gz,data/SRR19908723.R2.fastq.gz,Vdarrowii,
 SRR19908722,data/SRR19908722.R1.fastq.gz,data/SRR19908722.R2.fastq.gz,Vdarrowii,2
 SRR19908705,data/SRR19908705.R1.fastq.gz,data/SRR19908705.R2.fastq.gz,Vdarrowii,2
 ```
-Relative paths are acceptable too provided the root is the nextflow launch directory. Here is a real example where the sample sheet and the reads are in `root/data`
 
+Relative paths are acceptable when the Nextflow launch directory is the parent of `data/`; otherwise use absolute paths. See [`assets/samplesheet.csv`](assets/samplesheet.csv) and [`assets/schema_input.json`](assets/schema_input.json) for the canonical template and validation rules.
 
-A reference genome is expected. This is for reference alignment and genotyping. An interval file is also needed for GATK. The parameters can be defined from the command line with `reference` and `intervals`, respectively. Here is an example:
+### Required inputs
+
+| Flag           | Description                                                                                                                                                            |
+| -------------- | ---------------------------------------------------------------------------------------------------------------------------------------------------------------------- |
+| `--input`      | Path to the samplesheet described above.                                                                                                                               |
+| `--outdir`     | Output directory.                                                                                                                                                      |
+| `--reference`  | FASTA reference genome used for BWA alignment and GATK genotyping (`.fa`, `.fasta`, optionally `.gz`).                                                                  |
+| `--intervals`  | GATK-style intervals list passed to `GenomicsDBImport`. Prepare with `bin/prepare_intervals.py` (see the script for chromosome renaming and `.list` generation).        |
+
+The PhiX contamination reference used by `BBMAP_BBDUK` ships with the pipeline at `assets/phix174_ill.ref.fa` — there is no command-line flag for it.
+
+### Example invocations
+
+Docker:
 ```bash
-nextflow run pgp --input pgp_data/samplesheet.csv --outdir pgp_result --intervals pgp_data/ref/intervals.list --reference pgp_data/ref/ref.fa --phix pgp_data/db/bbduk/phix174_ill.ref.fa -profile docker
+nextflow run tileylab/pgp \
+    --input pgp_data/samplesheet.csv \
+    --outdir pgp_result \
+    --reference pgp_data/ref/ref.fa \
+    --intervals pgp_data/ref/intervals.list \
+    -profile docker
 ```
-The reference fasta file is also has a default in the config and json as `data/ref/ref.fa` but this can be overwritten at the command line if need be. Similar to the samplesheet and fastq availability, one might be able to provide a relative path or need to provide a full path depending on the resource.
 
-A script for preparing the *intervals* file is available at `bin/prepare_intervals.py`. It might be automated in the pipeline to create the intervals file from the reference genome, but for now it is simply an isolated step the user needs to do and think about.
+Singularity on slurm:
+```bash
+nextflow run tileylab/pgp \
+    --input pgp_data/samplesheet.csv \
+    --outdir pgp_result \
+    --reference pgp_data/ref/ref.fa \
+    --intervals pgp_data/ref/intervals.list \
+    --slurm_queue compute \
+    -profile slurm,singularity
+```
 
-Some notable options have been pre-configure in `conf\modules.config`:
- * Only properly paired reads with a mapping score of at least 20 are retained for genotyping with '-b -q 20 -f 2' -F 4' applied by samtools view
- * Some cpu allocations need to be changed here rather than editing the profiles in the module main.nf scripts because the linting will complain
- * HaplotypeCaller from GATK runs in GVCF mode. This would need to be changed to *BP_RESOLUTION* if genotype information for all sites, such as differentiating between invariant and data-deficient, is needed.
+### Available profiles
+
+Multiple profiles can be combined (e.g. `-profile slurm,singularity`):
+
+- **Containers / package managers:** `docker`, `singularity`, `apptainer`, `podman`, `shifter`, `charliecloud`, `wave`, `conda`, `mamba`
+- **Executors:** `slurm` (use `--slurm_queue <partition>` to pin a partition; otherwise the cluster default is used)
+- **Architecture:** `arm64`, `emulate_amd64`, `gpu`
+- **Testing:** `test` (uses the bundled synthetic dataset under `tests/data/`)
+
+### Notable pre-configured behavior
+
+A few things are baked into `conf/modules.config` rather than exposed as flags:
+
+- Only properly paired reads with mapping quality ≥ 20 are retained for genotyping (`samtools view -b -q 20 -f 2 -F 4`).
+- Per-process CPU and memory overrides live in `conf/modules.config` (kept here so module `main.nf` files stay lint-clean).
+- `HaplotypeCaller` runs in `GVCF` mode. Switch to `BP_RESOLUTION` there if you need per-site genotype information (e.g. to distinguish invariant from data-deficient).
 
 ## Credits
 
@@ -68,11 +117,6 @@ tileylab/pgp was originally written by George P. Tiley.
 If you would like to contribute to this pipeline, please see the [contributing guidelines](.github/CONTRIBUTING.md).
 
 ## Citations
-
-<!-- TODO nf-core: Add citation for pipeline after first release. Uncomment lines below and update Zenodo doi and badge at the top of this file. -->
-<!-- If you use tileylab/pgp for your analysis, please cite it using the following doi: [10.5281/zenodo.XXXXXX](https://doi.org/10.5281/zenodo.XXXXXX) -->
-
-<!-- TODO nf-core: Add bibliography of tools and data used in your pipeline -->
 
 An extensive list of references for the tools used by the pipeline can be found in the [`CITATIONS.md`](CITATIONS.md) file.
 
