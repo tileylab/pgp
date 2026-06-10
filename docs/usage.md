@@ -162,7 +162,23 @@ You can also supply a run name to resume a specific run: `-resume [run-name]`. U
 
 Specify the path to a specific config file (this is a core Nextflow command). Useful for institutional resource tweaks (e.g. a custom `slurm.config` with per-process queues, account strings, or scratch directories).
 
-## Custom configuration
+### Skip Duplicate Marking For Targeted Libraries
+
+For assays where duplicate marking is not biologically appropriate (for example restriction-enzyme or probe-targeted sequencing), you can bypass Picard duplicate marking:
+
+```bash
+nextflow run tileylab/pgp \
+  --input ./samplesheet.csv \
+  --outdir ./results \
+  --reference ./reference.fa \
+  --intervals ./intervals.list \
+  --skip_markduplicates \
+  -profile docker
+```
+
+When `--skip_markduplicates` is enabled, the workflow sends `SAMTOOLS_VIEW`-filtered BAMs directly to HaplotypeCaller after indexing, instead of running `PICARD_MARKDUPLICATES`.
+
+### nf-core/configs
 
 ### Resource requests
 
