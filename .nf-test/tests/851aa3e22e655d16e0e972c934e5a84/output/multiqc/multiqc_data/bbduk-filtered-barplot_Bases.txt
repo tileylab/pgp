@@ -1,3 +1,0 @@
-Sample	Result bases
-sample1_R1	150000.0
-sample2_R1	150000.0

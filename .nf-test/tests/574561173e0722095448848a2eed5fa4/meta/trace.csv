@@ -1,2 +1,0 @@
-task_id	hash	native_id	name	status	exit	submit	duration	realtime	%cpu	peak_rss	peak_vmem	rchar	wchar
-1	f1/3a2828	20792	GATK4_HAPLOTYPECALLER (test_cram)	COMPLETED	0	2026-03-20 10:05:14.596	18.6s	10.4s	209.2%	688.3 MB	14.2 GB	96.5 MB	709.1 KB

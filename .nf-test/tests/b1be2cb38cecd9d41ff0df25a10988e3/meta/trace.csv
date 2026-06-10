@@ -1,2 +1,0 @@
-task_id	hash	native_id	name	status	exit	submit	duration	realtime	%cpu	peak_rss	peak_vmem	rchar	wchar
-1	e7/613697	20528	GATK4_GENOMICSDBIMPORT (test)	COMPLETED	0	2026-03-20 10:03:59.647	10.5s	2.2s	192.4%	23.8 MB	1.4 GB	46.4 MB	1.3 KB

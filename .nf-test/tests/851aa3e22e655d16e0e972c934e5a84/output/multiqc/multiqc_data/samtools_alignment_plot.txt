@@ -1,3 +1,0 @@
-Sample	Mapped (with MQ>0)
-sample1	1000.0
-sample2	1000.0

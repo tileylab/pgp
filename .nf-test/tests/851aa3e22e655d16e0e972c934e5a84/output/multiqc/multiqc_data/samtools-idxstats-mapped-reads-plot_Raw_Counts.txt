@@ -1,3 +1,0 @@
-Sample	0	1	2
-sample1	('chr1', 378)	('chr2', 342)	('chr3', 280)
-sample2	('chr1', 386)	('chr2', 342)	('chr3', 272)
