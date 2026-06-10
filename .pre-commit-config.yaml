@@ -12,7 +12,6 @@ repos:
         args: [--markdown-linebreak-ext=md]
         exclude: |
           (?x)^(
-              .*ro-crate-metadata.json$|
               modules/nf-core/.*|
               subworkflows/nf-core/.*|
               .*\.snap$
@@ -20,7 +19,6 @@ repos:
       - id: end-of-file-fixer
         exclude: |
           (?x)^(
-              .*ro-crate-metadata.json$|
               modules/nf-core/.*|
               subworkflows/nf-core/.*|
               .*\.snap$

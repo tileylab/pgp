@@ -14,13 +14,13 @@ You will need to create a samplesheet describing your samples before running the
 --input '[path to samplesheet file]'
 ```
 
-| Column    | Description                                                                                       |
-| --------- | ------------------------------------------------------------------------------------------------- |
-| `sample`  | Unique sample identifier (no spaces). Becomes `meta.id` in the workflow.                          |
-| `fastq_1` | Path to gzipped FastQ for read 1 (`.fastq.gz` or `.fq.gz`).                                       |
-| `fastq_2` | Path to gzipped FastQ for read 2. Leave empty for single-end data.                                |
-| `species` | Species, population, or other grouping identifier (no spaces). Required.                          |
-| `ploidy`  | Sample ploidy as a positive integer. Required.                                                    |
+| Column    | Description                                                              |
+| --------- | ------------------------------------------------------------------------ |
+| `sample`  | Unique sample identifier (no spaces). Becomes `meta.id` in the workflow. |
+| `fastq_1` | Path to gzipped FastQ for read 1 (`.fastq.gz` or `.fq.gz`).              |
+| `fastq_2` | Path to gzipped FastQ for read 2. Leave empty for single-end data.       |
+| `species` | Species, population, or other grouping identifier (no spaces). Required. |
+| `ploidy`  | Sample ploidy as a positive integer. Required.                           |
 
 `species` and `ploidy` are both required by [`assets/schema_input.json`](../assets/schema_input.json); runs will fail validation if either is missing.
 
@@ -87,10 +87,10 @@ nextflow run tileylab/pgp -profile docker -params-file params.yaml
 with:
 
 ```yaml title="params.yaml"
-input: './samplesheet.csv'
-outdir: './results/'
-reference: './ref/ref.fa'
-intervals: './ref/intervals.list'
+input: "./samplesheet.csv"
+outdir: "./results/"
+reference: "./ref/ref.fa"
+intervals: "./ref/intervals.list"
 ```
 
 ### Updating the pipeline
