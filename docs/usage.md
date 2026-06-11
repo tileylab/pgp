@@ -178,8 +178,6 @@ nextflow run tileylab/pgp \
 
 When `--skip_markduplicates` is enabled, the workflow sends `SAMTOOLS_VIEW`-filtered BAMs directly to HaplotypeCaller after indexing, instead of running `PICARD_MARKDUPLICATES`.
 
-### nf-core/configs
-
 ### Resource requests
 
 Whilst the default requirements set within the pipeline will hopefully work for most people and with most input data, you may find that you want to customise the compute resources that the pipeline requests. Each step in the pipeline has a default set of requirements for number of CPUs, memory, and time. Per-process overrides live in `conf/modules.config`; default per-label resources live in `conf/base.config`. Failed jobs are automatically resubmitted with higher resources (2x then 3x) on retryable exit codes.
