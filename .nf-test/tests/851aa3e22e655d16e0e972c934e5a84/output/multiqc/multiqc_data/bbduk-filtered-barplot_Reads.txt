@@ -1,3 +1,0 @@
-Sample	Result reads
-sample1_R1	1000.0
-sample2_R1	1000.0

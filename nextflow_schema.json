@@ -20,7 +20,7 @@
                     "mimetype": "text/csv",
                     "pattern": "^\\S+\\.csv$",
                     "description": "Path to comma-separated file containing information about the samples in the experiment.",
-                    "help_text": "You will need to create a design file with information about the samples in your experiment before running the pipeline. Use this parameter to specify its location. It has to be a comma-separated file with 3 columns, and a header row.",
+                    "help_text": "Use this parameter to specify the path to the samplesheet describing your samples. It must be a comma-separated file with a header row and 5 columns: `sample`, `fastq_1`, `fastq_2`, `species`, `ploidy`. `fastq_2` may be empty for single-end data; all other columns are required.",
                     "fa_icon": "fas fa-file-csv"
                 },
                 "outdir": {
@@ -71,51 +71,16 @@
                 }
             }
         },
-        "institutional_config_options": {
-            "title": "Institutional config options",
+        "execution_options": {
+            "title": "Execution options",
             "type": "object",
-            "fa_icon": "fas fa-university",
-            "description": "Parameters used to describe centralised config profiles. These should not be edited.",
-            "help_text": "The centralised nf-core configuration profiles use a handful of pipeline parameters to describe themselves. This information is then printed to the Nextflow log when you run a pipeline. You should not need to change these values when you run a pipeline.",
+            "fa_icon": "fas fa-server",
+            "description": "Options for controlling the execution environment.",
             "properties": {
-                "custom_config_version": {
+                "slurm_queue": {
                     "type": "string",
-                    "description": "Git commit id for Institutional configs.",
-                    "default": "master",
-                    "hidden": true,
-                    "fa_icon": "fas fa-users-cog"
-                },
-                "custom_config_base": {
-                    "type": "string",
-                    "description": "Base directory for Institutional configs.",
-                    "default": "https://raw.githubusercontent.com/nf-core/configs/master",
-                    "hidden": true,
-                    "help_text": "If you're running offline, Nextflow will not be able to fetch the institutional config files from the internet. If you don't need them, then this is not a problem. If you do need them, you should download the files from the repo and tell Nextflow where to find them with this parameter.",
-                    "fa_icon": "fas fa-users-cog"
-                },
-                "config_profile_name": {
-                    "type": "string",
-                    "description": "Institutional config name.",
-                    "hidden": true,
-                    "fa_icon": "fas fa-users-cog"
-                },
-                "config_profile_description": {
-                    "type": "string",
-                    "description": "Institutional config description.",
-                    "hidden": true,
-                    "fa_icon": "fas fa-users-cog"
-                },
-                "config_profile_contact": {
-                    "type": "string",
-                    "description": "Institutional config contact information.",
-                    "hidden": true,
-                    "fa_icon": "fas fa-users-cog"
-                },
-                "config_profile_url": {
-                    "type": "string",
-                    "description": "Institutional config URL link.",
-                    "hidden": true,
-                    "fa_icon": "fas fa-users-cog"
+                    "description": "Slurm partition / queue name. Only used when the `slurm` profile is active.",
+                    "fa_icon": "fas fa-stream"
                 }
             }
         },
@@ -201,13 +166,6 @@
                     "fa_icon": "fas fa-check-square",
                     "hidden": true
                 },
-                "pipelines_testdata_base_path": {
-                    "type": "string",
-                    "fa_icon": "far fa-check-circle",
-                    "description": "Base URL or local path to location of pipeline test dataset files",
-                    "default": "https://raw.githubusercontent.com/nf-core/test-datasets/",
-                    "hidden": true
-                },
                 "trace_report_suffix": {
                     "type": "string",
                     "fa_icon": "far calendar",
@@ -244,7 +202,7 @@
             "$ref": "#/$defs/reference_genome_options"
         },
         {
-            "$ref": "#/$defs/institutional_config_options"
+            "$ref": "#/$defs/execution_options"
         },
         {
             "$ref": "#/$defs/generic_options"
