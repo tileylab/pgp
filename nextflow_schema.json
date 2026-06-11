@@ -183,6 +183,13 @@
                 "show_hidden": {
                     "type": "boolean",
                     "description": "Display hidden parameters in the help message (only works when --help or --help_full are provided)."
+                },
+                "skip_markduplicates": {
+                    "type": "boolean",
+                    "default": false,
+                    "description": "Skip PICARD_MARKDUPLICATES and pass SAMTOOLS_VIEW-filtered BAMs directly to HaplotypeCaller.",
+                    "help_text": "Enable this for assays where duplicate marking is not biologically appropriate (for example restriction enzyme or probe-based targeted sequencing).",
+                    "fa_icon": "fas fa-forward"
                 }
             }
         }
