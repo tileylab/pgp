@@ -33,6 +33,9 @@ include { SAMTOOLS_INDEX } from '../modules/nf-core/samtools/index/main'
 include { SAMTOOLS_INDEX as SAMTOOLS_INDEX_PASSDUPS } from '../modules/nf-core/samtools/index/main'
 include { SAMTOOLS_VIEW } from '../modules/nf-core/samtools/view/main'
 
+include { VCFTOOLS_FILTER } from '../modules/local/vcftools/filter/main'
+include { BGZIP_TABIX } from '../modules/local/bgzip_tabix/main'
+
 // Subworkflows added from nf-core
 include { BAM_STATS_SAMTOOLS } from '../subworkflows/nf-core/bam_stats_samtools/main'
 
@@ -324,6 +327,31 @@ NOTE: Not bothering with splitting on intervals since the microbial genomes are 
         meta, vcf, tbi -> [meta, vcf, tbi]
     }
     //bipass_vcf_tbi.view()
+
+    /*
+        Iterative VCFtools filtering of the joint VCF.
+        Operates on the .snps.gatkfilters joint VCF (SELECT_PASS). Outgroups are
+        flagged in the samplesheet (outgroup column); their IDs are collected here
+        and passed to vcftools --remove for the ingroup-only products.
+    */
+    ch_outgroups = ch_samplesheet
+        .filter { meta, reads -> (meta.outgroup as Integer) == 1 }
+        .map    { meta, reads -> meta.id }
+        .collectFile(name: 'outgroups.txt', newLine: true)
+        .ifEmpty([])
+
+    VCFTOOLS_FILTER (
+        pass_vcf_tbi,
+        ch_outgroups
+    )
+    ch_versions = ch_versions.mix(VCFTOOLS_FILTER.out.versions_vcftools.first())
+    ch_multiqc_files = ch_multiqc_files.mix(VCFTOOLS_FILTER.out.mqc.flatten())
+
+    // Compress + index the final VCFtools products
+    BGZIP_TABIX (
+        VCFTOOLS_FILTER.out.products
+    )
+    ch_versions = ch_versions.mix(BGZIP_TABIX.out.versions_tabix.first())
 
     //
     // Collate and save software versions

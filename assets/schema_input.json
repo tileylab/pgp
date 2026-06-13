@@ -36,8 +36,14 @@
                 "type": "integer",
                 "pattern": "^\\d+$",
                 "errorMessage": "Ploidy must be a positive integer."
+            },
+            "outgroup": {
+                "type": "integer",
+                "enum": [0, 1],
+                "errorMessage": "Outgroup must be 0 (ingroup) or 1 (outgroup).",
+                "meta": ["outgroup"]
             }
         },
-        "required": ["sample", "fastq_1", "species", "ploidy"]
+        "required": ["sample", "fastq_1", "species", "ploidy", "outgroup"]
     }
 }

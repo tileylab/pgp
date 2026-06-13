@@ -38,16 +38,17 @@ The pipeline takes a comma-separated samplesheet with one row per sample and the
 | `sample`  | string  | Sample identifier. Must be unique and cannot contain spaces. Becomes the `meta.id` in the workflow. |
 | `fastq_1` | path    | Path to gzipped FASTQ file for read 1 (`.fastq.gz` or `.fq.gz`).                                    |
 | `fastq_2` | path    | Path to gzipped FASTQ file for read 2. Leave empty for single-end libraries.                        |
-| `species` | string  | Species, population, or other grouping label. No spaces.                                            |
-| `ploidy`  | integer | Sample ploidy (positive integer). Currently informational; reserved for upcoming polyploid models.  |
+| `species`  | string  | Species, population, or other grouping label. No spaces.                                            |
+| `ploidy`   | integer | Sample ploidy (positive integer). Currently informational; reserved for upcoming polyploid models.  |
+| `outgroup` | integer | `0` for ingroup, `1` for outgroup. Outgroup samples are dropped from the ingroup-only VCFtools products. |
 
 `samplesheet.csv`:
 
 ```csv
-sample,fastq_1,fastq_2,species,ploidy
-SRR19908723,data/SRR19908723.R1.fastq.gz,data/SRR19908723.R2.fastq.gz,Vdarrowii,2
-SRR19908722,data/SRR19908722.R1.fastq.gz,data/SRR19908722.R2.fastq.gz,Vdarrowii,2
-SRR19908705,data/SRR19908705.R1.fastq.gz,data/SRR19908705.R2.fastq.gz,Vdarrowii,2
+sample,fastq_1,fastq_2,species,ploidy,outgroup
+SRR19908723,data/SRR19908723.R1.fastq.gz,data/SRR19908723.R2.fastq.gz,Vdarrowii,2,0
+SRR19908722,data/SRR19908722.R1.fastq.gz,data/SRR19908722.R2.fastq.gz,Vdarrowii,2,0
+SRR19908705,data/SRR19908705.R1.fastq.gz,data/SRR19908705.R2.fastq.gz,Vdarrowii,2,1
 ```
 
 Relative paths are acceptable when the Nextflow launch directory is the parent of `data/`; otherwise use absolute paths. See [`assets/samplesheet.csv`](assets/samplesheet.csv) and [`assets/schema_input.json`](assets/schema_input.json) for the canonical template and validation rules.

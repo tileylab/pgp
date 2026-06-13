@@ -12,9 +12,9 @@ nextflow_pipeline {
             def samplesheet = new File("${outputDir}/test_samplesheet.csv")
             samplesheet.parentFile.mkdirs()
             samplesheet.text = """\
-sample,fastq_1,fastq_2,species,ploidy
-sample1,${testDataDir}/sample1_R1.fastq.gz,${testDataDir}/sample1_R2.fastq.gz,test_species,2
-sample2,${testDataDir}/sample2_R1.fastq.gz,${testDataDir}/sample2_R2.fastq.gz,test_species,2
+sample,fastq_1,fastq_2,species,ploidy,outgroup
+sample1,${testDataDir}/sample1_R1.fastq.gz,${testDataDir}/sample1_R2.fastq.gz,test_species,2,0
+sample2,${testDataDir}/sample2_R1.fastq.gz,${testDataDir}/sample2_R2.fastq.gz,test_species,2,1
 """
         }
 
@@ -48,6 +48,18 @@ sample2,${testDataDir}/sample2_R1.fastq.gz,${testDataDir}/sample2_R2.fastq.gz,te
                 // Check that VCF files were produced at each filtering stage
                 { assert new File("${params.outdir}/gatk4").listFiles()
                     .findAll { it.name.endsWith('.vcf.gz') }.size() > 0 },
+
+                // VCFtools filtering stage ran; products are bgzipped + tabix-indexed
+                { assert new File("${params.outdir}/vcftools").exists() },
+                { assert new File("${params.outdir}/vcftools").listFiles()
+                    .findAll { it.name.endsWith('.filtered.vcf.gz') }.size() > 0 },
+                { assert new File("${params.outdir}/vcftools").listFiles()
+                    .findAll { it.name.endsWith('.vcf.gz.tbi') }.size() > 0 },
+                // sample2 is flagged outgroup=1, so the ingroup-only product is produced
+                { assert new File("${params.outdir}/vcftools").listFiles()
+                    .findAll { it.name.contains('ingroup') && it.name.endsWith('.vcf.gz') }.size() > 0 },
+                // per-stage filtering summary table is emitted
+                { assert new File("${params.outdir}/vcftools/reports/vcftools_filtering_summary.tsv").exists() },
 
                 // Pipeline info directory exists
                 { assert new File("${params.outdir}/pipeline_info").exists() }

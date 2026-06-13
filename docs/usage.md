@@ -8,41 +8,42 @@ This page documents the samplesheet format, the typical command line, and the av
 
 ## Samplesheet input
 
-You will need to create a samplesheet describing your samples before running the pipeline. It must be a comma-separated file with a header row and five columns:
+You will need to create a samplesheet describing your samples before running the pipeline. It must be a comma-separated file with a header row and six columns:
 
 ```bash
 --input '[path to samplesheet file]'
 ```
 
-| Column    | Description                                                              |
-| --------- | ------------------------------------------------------------------------ |
-| `sample`  | Unique sample identifier (no spaces). Becomes `meta.id` in the workflow. |
-| `fastq_1` | Path to gzipped FastQ for read 1 (`.fastq.gz` or `.fq.gz`).              |
-| `fastq_2` | Path to gzipped FastQ for read 2. Leave empty for single-end data.       |
-| `species` | Species, population, or other grouping identifier (no spaces). Required. |
-| `ploidy`  | Sample ploidy as a positive integer. Required.                           |
+| Column     | Description                                                                                              |
+| ---------- | ------------------------------------------------------------------------------------------------------- |
+| `sample`   | Unique sample identifier (no spaces). Becomes `meta.id` in the workflow.                                 |
+| `fastq_1`  | Path to gzipped FastQ for read 1 (`.fastq.gz` or `.fq.gz`).                                              |
+| `fastq_2`  | Path to gzipped FastQ for read 2. Leave empty for single-end data.                                      |
+| `species`  | Species, population, or other grouping identifier (no spaces). Required.                                 |
+| `ploidy`   | Sample ploidy as a positive integer. Required.                                                          |
+| `outgroup` | `0` (ingroup) or `1` (outgroup). Required. Outgroups are removed from the ingroup-only VCFtools products. |
 
-`species` and `ploidy` are both required by [`assets/schema_input.json`](../assets/schema_input.json); runs will fail validation if either is missing.
+`species`, `ploidy`, and `outgroup` are all required by [`assets/schema_input.json`](../assets/schema_input.json); runs will fail validation if any is missing.
 
 ### Multiple lanes for the same sample
 
 The same `sample` identifier may appear on multiple rows when a library was sequenced across lanes. The pipeline groups by `sample` and concatenates raw reads before downstream analysis. All rows for a given sample must agree on endedness (all paired or all single).
 
 ```csv title="samplesheet.csv"
-sample,fastq_1,fastq_2,species,ploidy
-CONTROL_REP1,AEG588A1_S1_L002_R1_001.fastq.gz,AEG588A1_S1_L002_R2_001.fastq.gz,Vdarrowii,2
-CONTROL_REP1,AEG588A1_S1_L003_R1_001.fastq.gz,AEG588A1_S1_L003_R2_001.fastq.gz,Vdarrowii,2
-CONTROL_REP1,AEG588A1_S1_L004_R1_001.fastq.gz,AEG588A1_S1_L004_R2_001.fastq.gz,Vdarrowii,2
+sample,fastq_1,fastq_2,species,ploidy,outgroup
+CONTROL_REP1,AEG588A1_S1_L002_R1_001.fastq.gz,AEG588A1_S1_L002_R2_001.fastq.gz,Vdarrowii,2,0
+CONTROL_REP1,AEG588A1_S1_L003_R1_001.fastq.gz,AEG588A1_S1_L003_R2_001.fastq.gz,Vdarrowii,2,0
+CONTROL_REP1,AEG588A1_S1_L004_R1_001.fastq.gz,AEG588A1_S1_L004_R2_001.fastq.gz,Vdarrowii,2,0
 ```
 
 ### Mixed single- and paired-end example
 
 ```csv title="samplesheet.csv"
-sample,fastq_1,fastq_2,species,ploidy
-CONTROL_REP1,AEG588A1_S1_L002_R1_001.fastq.gz,AEG588A1_S1_L002_R2_001.fastq.gz,Vdarrowii,2
-CONTROL_REP2,AEG588A2_S2_L002_R1_001.fastq.gz,AEG588A2_S2_L002_R2_001.fastq.gz,Vdarrowii,2
-TREATMENT_REP1,AEG588A4_S4_L003_R1_001.fastq.gz,,Vcorymbosum,4
-TREATMENT_REP2,AEG588A5_S5_L003_R1_001.fastq.gz,,Vcorymbosum,4
+sample,fastq_1,fastq_2,species,ploidy,outgroup
+CONTROL_REP1,AEG588A1_S1_L002_R1_001.fastq.gz,AEG588A1_S1_L002_R2_001.fastq.gz,Vdarrowii,2,0
+CONTROL_REP2,AEG588A2_S2_L002_R1_001.fastq.gz,AEG588A2_S2_L002_R2_001.fastq.gz,Vdarrowii,2,0
+TREATMENT_REP1,AEG588A4_S4_L003_R1_001.fastq.gz,,Vcorymbosum,4,1
+TREATMENT_REP2,AEG588A5_S5_L003_R1_001.fastq.gz,,Vcorymbosum,4,1
 ```
 
 An [example samplesheet](../assets/samplesheet.csv) ships with the pipeline.
@@ -177,6 +178,27 @@ nextflow run tileylab/pgp \
 ```
 
 When `--skip_markduplicates` is enabled, the workflow sends `SAMTOOLS_VIEW`-filtered BAMs directly to HaplotypeCaller after indexing, instead of running `PICARD_MARKDUPLICATES`.
+
+### VCFtools filtering
+
+After GATK genotyping and hard-filtering, the joint `.snps.gatkfilters` VCF is passed through an iterative VCFtools filtering stage (`VCFTOOLS_FILTER`). It seeds with a mean-depth floor, then alternates site-level `--max-missing` filtering with removal of individuals whose missingness exceeds a per-round cutoff, applies a site mean-depth outlier cut, drops any remaining flagged sites, and finally emits analysis-ready subsets (biallelic, MAC-filtered, thinned, and ingroup-only).
+
+Outputs land under `results/vcftools/` as bgzip-compressed, tabix-indexed `.vcf.gz` + `.vcf.gz.tbi` (cleaned and subset VCFs). `results/vcftools/reports/` holds the per-round `.imiss` missingness tables, `removed_individuals.tsv`, and `vcftools_filtering_summary.tsv` — a per-stage table of how many SNPs and individuals are retained through the filtering process. That same summary is rendered in the MultiQC report as a **VCFtools filtering** section (a table plus SNP and individual trend bargraphs across stages).
+
+The schedule and thresholds are tunable so you can iterate:
+
+| Param | Default | Description |
+| ----- | ------- | ----------- |
+| `--skip_vcftools` | `false` | Skip the whole stage. |
+| `--vcf_min_meandp` | `5` | Initial site mean-depth floor (`--min-meanDP`). |
+| `--vcf_site_missing` | `0.5,0.4,0.3` | Comma-separated site `--max-missing` schedule. |
+| `--vcf_indiv_missing` | `0.9,0.7,0.5` | Per-round individual `F_MISS` removal cutoffs (paired with the site schedule). |
+| `--vcf_depth_sd` | `2` | `--max-meanDP` = mean + N·SD of site mean depth. |
+| `--vcf_max_missing_final` | _(unset)_ | Optional final `--max-missing` after the depth cut. |
+| `--vcf_mac` | `3` | `--mac` for the biallelic subset. |
+| `--vcf_thin` | `10000` | `--thin` for the biallelic subset. |
+
+Ingroup-only products (`*.ingroup.biallelic.vcf`) are produced only when at least one sample is flagged `outgroup=1` in the samplesheet; those samples are dropped via `vcftools --remove`.
 
 ### Resource requests
 
