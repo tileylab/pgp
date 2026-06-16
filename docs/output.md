@@ -2,30 +2,93 @@
 
 ## Introduction
 
-This document describes the output produced by the pipeline. Most of the plots are taken from the MultiQC report, which summarises results at the end of the pipeline.
-
-The directories listed below will be created in the results directory after the pipeline has finished. All paths are relative to the top-level results directory.
+This document describes the output produced by the pipeline. The directories listed below are created in the `--outdir` results directory after the pipeline finishes; all paths are relative to that top-level directory. VCFs are bgzip-compressed and tabix-indexed (`.vcf.gz` + `.vcf.gz.tbi`).
 
 ## Pipeline overview
 
-The pipeline is built using [Nextflow](https://www.nextflow.io/) and processes data using the following steps:
+The pipeline processes data through the following steps:
 
-- [FastQC](#fastqc) - Raw read QC
-- [MultiQC](#multiqc) - Aggregate report describing results and QC from the whole pipeline
-- [Pipeline information](#pipeline-information) - Report metrics generated during the workflow execution
+- [Read QC and preprocessing](#read-qc-and-preprocessing) — FastQC, fastp trimming, BBDuk PhiX decontamination
+- [Alignment](#alignment) — BWA-MEM mapping, filtering, duplicate marking
+- [Variant calling](#variant-calling) — GATK HaplotypeCaller + joint genotyping
+- [Hard-filtered SNP sets](#hard-filtered-snp-sets) — GATK best-practice annotation filters
+- [VCFtools filtering](#vcftools-filtering) — iterative missingness/depth filtering + analysis subsets
+- [MultiQC](#multiqc) — aggregate QC report
+- [Pipeline information](#pipeline-information) — run metrics and software versions
 
-### FastQC
+See [usage.md](usage.md#hard-filtering-strategy) for the full hard-filtering strategy and how to tune the thresholds.
+
+### Read QC and preprocessing
 
 <details markdown="1">
 <summary>Output files</summary>
 
-- `fastqc/`
-  - `*_fastqc.html`: FastQC report containing quality metrics.
-  - `*_fastqc.zip`: Zip archive containing the FastQC report, tab-delimited data file and plot images.
+- `fastqc/` — `*_fastqc.html` / `*_fastqc.zip`: per-sample raw-read quality metrics.
+- `fastp/` — `*.fastp.html` / `*.fastp.json` / `*.fastp.log`: adapter and quality trimming reports.
+- `bbmap/` — `*.bbduk.log`: PhiX (sequencing spike-in) decontamination with BBDuk against `assets/phix174_ill.ref.fa`.
 
 </details>
 
-[FastQC](http://www.bioinformatics.babraham.ac.uk/projects/fastqc/) gives general quality metrics about your sequenced reads. It provides information about the quality score distribution across your reads, per base sequence content (%A/T/G/C), adapter contamination and overrepresented sequences. For further reading and documentation see the [FastQC help pages](http://www.bioinformatics.babraham.ac.uk/projects/fastqc/Help/).
+[FastQC](http://www.bioinformatics.babraham.ac.uk/projects/fastqc/) reports per-base quality, GC content, adapter contamination, and overrepresented sequences. [fastp](https://github.com/OpenGene/fastp) trims adapters and low-quality bases; [BBDuk](https://jgi.doe.gov/data-and-tools/software-tools/bbtools/) removes PhiX reads before alignment.
+
+### Alignment
+
+<details markdown="1">
+<summary>Output files</summary>
+
+- `bwa/` — `*.bam`: reads mapped to the reference with BWA-MEM (read groups set from the sample id).
+- `samtools/` — Q20, properly-paired BAMs (`samtools view -b -q 20 -f 2 -F 4`) plus `*.bai` indexes and `*.stats`/`*.flagstat`/`*.idxstats` summaries.
+- `picard/` — `*.markdup.bam` + `*.MarkDuplicates.metrics.txt` (PCR duplicate marking; skipped when `--skip_markduplicates` is set).
+
+</details>
+
+### Variant calling
+
+<details markdown="1">
+<summary>Output files</summary>
+
+- `gatk4/`
+  - `<sample>.vcf.gz` — per-sample gVCFs from HaplotypeCaller (GVCF mode).
+  - `joint_genotyping/` — the GenomicsDB workspace used for joint genotyping.
+  - `joint_genotyping.vcf.gz` — the raw joint-genotyped multi-sample VCF.
+  - `joint_genotyping.snps.annotations.vcf.gz` — SNPs with the GATK `FILTER` column populated by `VariantFiltration`.
+  - `reference.dict` — sequence dictionary for the reference.
+
+</details>
+
+[GATK4](https://gatk.broadinstitute.org/) calls variants per sample in GVCF mode, then joint-genotypes the cohort. Because the target genomes are small, genotyping is run without interval scatter-gather.
+
+### Hard-filtered SNP sets
+
+<details markdown="1">
+<summary>Output files</summary>
+
+- `select/`
+  - `joint_genotyping.snps.vcf.gz` — SNP sites only (`SELECT_ALL`).
+  - `joint_genotyping.snps.gatkfilters.vcf.gz` — SNPs passing the GATK best-practice hard filters (`SELECT_PASS`); this is the input to the VCFtools stage.
+  - `joint_genotyping.biallelic.gatkfilters.vcf.gz` — the PASS set restricted to biallelic SNPs (`SELECT_BIPASS`).
+
+</details>
+
+The GATK filter expressions (FS, MQ, ReadPosRankSum, MQRankSum, QD, SOR) are listed and explained in [usage.md](usage.md#stage-1--gatk-best-practice-hard-filters). The intermediate VCFs at each stage are kept so you can start from a less- or more-filtered set if the defaults are too aggressive.
+
+### VCFtools filtering
+
+<details markdown="1">
+<summary>Output files</summary>
+
+- `vcftools/` — final products of the iterative VCFtools stage:
+  - `*.filtered.vcf.gz` — the cleaned VCF after the missingness loop, depth-outlier cut, and `--remove-filtered-all`.
+  - `*.biallelic.vcf.gz`, `*.biallelic.mac<N>.vcf.gz`, `*.biallelic.mac<N>.thin<N>.vcf.gz` — analysis-ready biallelic / MAC-filtered / thinned subsets.
+  - `*.ingroup.biallelic.vcf.gz` — biallelic set with outgroup samples removed (only when at least one sample is flagged `outgroup=1`).
+- `vcftools/reports/`
+  - `indiv_<n>.imiss` — per-individual missingness for each removal round.
+  - `indiv_<n>.remove.txt` — individuals dropped in each round.
+  - `vcftools_filtering_summary.tsv` — SNPs and individuals retained at every filtering stage.
+
+</details>
+
+The per-stage `vcftools_filtering_summary.tsv` is also rendered in the MultiQC report (a **VCFtools filtering** table plus SNP/individual trend bargraphs). The thresholds are tunable — see [usage.md](usage.md#stage-2--vcftools-iterative-filtering).
 
 ### MultiQC
 
@@ -33,15 +96,13 @@ The pipeline is built using [Nextflow](https://www.nextflow.io/) and processes d
 <summary>Output files</summary>
 
 - `multiqc/`
-  - `multiqc_report.html`: a standalone HTML file that can be viewed in your web browser.
-  - `multiqc_data/`: directory containing parsed statistics from the different tools used in the pipeline.
-  - `multiqc_plots/`: directory containing static images from the report in various formats.
+  - `multiqc_report.html` — standalone HTML report.
+  - `multiqc_data/` — parsed statistics behind the report.
+  - `multiqc_plots/` — static images of the report plots.
 
 </details>
 
-[MultiQC](http://multiqc.info) is a visualization tool that generates a single HTML report summarising all samples in your project. Most of the pipeline QC results are visualised in the report and further statistics are available in the report data directory.
-
-Results generated by MultiQC collate pipeline QC from supported tools e.g. FastQC. The pipeline has special steps which also allow the software versions to be reported in the MultiQC output for future traceability. For more information about how to use MultiQC reports, see <http://multiqc.info>.
+[MultiQC](http://multiqc.info) aggregates QC across FastQC, fastp, BBDuk, samtools, Picard, and the VCFtools filtering summary into a single report, and records the software versions used.
 
 ### Pipeline information
 
@@ -49,11 +110,10 @@ Results generated by MultiQC collate pipeline QC from supported tools e.g. FastQ
 <summary>Output files</summary>
 
 - `pipeline_info/`
-  - Reports generated by Nextflow: `execution_report.html`, `execution_timeline.html`, `execution_trace.txt` and `pipeline_dag.dot`/`pipeline_dag.svg`.
-  - Reports generated by the pipeline: `pipeline_report.html`, `pipeline_report.txt` and `software_versions.yml`. The `pipeline_report*` files will only be present if the `--email` / `--email_on_fail` parameter's are used when running the pipeline.
-  - Reformatted samplesheet files used as input to the pipeline: `samplesheet.valid.csv`.
-  - Parameters used by the pipeline run: `params.json`.
+  - Nextflow execution reports: `execution_report_*.html`, `execution_timeline_*.html`, `execution_trace_*.txt`, `pipeline_dag_*.html`.
+  - `pgp_software_mqc_versions.yml` — software versions for every process.
+  - `params_*.json` — the parameters used for the run.
 
 </details>
 
-[Nextflow](https://www.nextflow.io/docs/latest/tracing.html) provides excellent functionality for generating various reports relevant to the running and execution of the pipeline. This will allow you to troubleshoot errors with the running of the pipeline, and also provide you with other information such as launch commands, run times and resource usage.
+[Nextflow](https://www.nextflow.io/docs/latest/tracing.html) generates the execution reports, which help troubleshoot failures and review run times and resource usage.
