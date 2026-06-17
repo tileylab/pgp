@@ -26,9 +26,14 @@ read_vcf() {
 printf 'stage\tindividuals\tsnps\n' > vcftools_filtering_summary.tsv
 for i in "${!labels[@]}"; do
     vcf=${vcfs[$i]}
-    ind=$(read_vcf "$vcf" | awk '/^#CHROM/{print NF-9; exit}')
-    snps=$(read_vcf "$vcf" | grep -vc '^#' || true)
-    printf '%s\t%s\t%s\n' "${labels[$i]}" "${ind:-0}" "${snps:-0}" >> vcftools_filtering_summary.tsv
+    # Single full-pass count: reading to EOF avoids SIGPIPE on the reader (an
+    # early `awk ... exit` would kill `cat`/`gzip -cd` and trip `pipefail`).
+    counts=$(read_vcf "$vcf" | awk '
+        /^#CHROM/ { ind = NF - 9 }
+        !/^#/     { snps++ }
+        END       { printf "%d\t%d", ind+0, snps+0 }
+    ')
+    printf '%s\t%s\n' "${labels[$i]}" "$counts" >> vcftools_filtering_summary.tsv
 done
 
 # MultiQC: summary table
