@@ -8,41 +8,42 @@ This page documents the samplesheet format, the typical command line, and the av
 
 ## Samplesheet input
 
-You will need to create a samplesheet describing your samples before running the pipeline. It must be a comma-separated file with a header row and five columns:
+You will need to create a samplesheet describing your samples before running the pipeline. It must be a comma-separated file with a header row and six columns:
 
 ```bash
 --input '[path to samplesheet file]'
 ```
 
-| Column    | Description                                                              |
-| --------- | ------------------------------------------------------------------------ |
-| `sample`  | Unique sample identifier (no spaces). Becomes `meta.id` in the workflow. |
-| `fastq_1` | Path to gzipped FastQ for read 1 (`.fastq.gz` or `.fq.gz`).              |
-| `fastq_2` | Path to gzipped FastQ for read 2. Leave empty for single-end data.       |
-| `species` | Species, population, or other grouping identifier (no spaces). Required. |
-| `ploidy`  | Sample ploidy as a positive integer. Required.                           |
+| Column     | Description                                                                                               |
+| ---------- | --------------------------------------------------------------------------------------------------------- |
+| `sample`   | Unique sample identifier (no spaces). Becomes `meta.id` in the workflow.                                  |
+| `fastq_1`  | Path to gzipped FastQ for read 1 (`.fastq.gz` or `.fq.gz`).                                               |
+| `fastq_2`  | Path to gzipped FastQ for read 2. Leave empty for single-end data.                                        |
+| `species`  | Species, population, or other grouping identifier (no spaces). Required.                                  |
+| `ploidy`   | Sample ploidy as a positive integer. Required.                                                            |
+| `outgroup` | `0` (ingroup) or `1` (outgroup). Required. Outgroups are removed from the ingroup-only VCFtools products. |
 
-`species` and `ploidy` are both required by [`assets/schema_input.json`](../assets/schema_input.json); runs will fail validation if either is missing.
+`species`, `ploidy`, and `outgroup` are all required by [`assets/schema_input.json`](../assets/schema_input.json); runs will fail validation if any is missing.
 
 ### Multiple lanes for the same sample
 
 The same `sample` identifier may appear on multiple rows when a library was sequenced across lanes. The pipeline groups by `sample` and concatenates raw reads before downstream analysis. All rows for a given sample must agree on endedness (all paired or all single).
 
 ```csv title="samplesheet.csv"
-sample,fastq_1,fastq_2,species,ploidy
-CONTROL_REP1,AEG588A1_S1_L002_R1_001.fastq.gz,AEG588A1_S1_L002_R2_001.fastq.gz,Vdarrowii,2
-CONTROL_REP1,AEG588A1_S1_L003_R1_001.fastq.gz,AEG588A1_S1_L003_R2_001.fastq.gz,Vdarrowii,2
-CONTROL_REP1,AEG588A1_S1_L004_R1_001.fastq.gz,AEG588A1_S1_L004_R2_001.fastq.gz,Vdarrowii,2
+sample,fastq_1,fastq_2,species,ploidy,outgroup
+CONTROL_REP1,AEG588A1_S1_L002_R1_001.fastq.gz,AEG588A1_S1_L002_R2_001.fastq.gz,Vdarrowii,2,0
+CONTROL_REP1,AEG588A1_S1_L003_R1_001.fastq.gz,AEG588A1_S1_L003_R2_001.fastq.gz,Vdarrowii,2,0
+CONTROL_REP1,AEG588A1_S1_L004_R1_001.fastq.gz,AEG588A1_S1_L004_R2_001.fastq.gz,Vdarrowii,2,0
 ```
 
 ### Mixed single- and paired-end example
 
 ```csv title="samplesheet.csv"
-sample,fastq_1,fastq_2,species,ploidy
-CONTROL_REP1,AEG588A1_S1_L002_R1_001.fastq.gz,AEG588A1_S1_L002_R2_001.fastq.gz,Vdarrowii,2
-CONTROL_REP2,AEG588A2_S2_L002_R1_001.fastq.gz,AEG588A2_S2_L002_R2_001.fastq.gz,Vdarrowii,2
-TREATMENT_REP1,AEG588A4_S4_L003_R1_001.fastq.gz,,Vcorymbosum,4
-TREATMENT_REP2,AEG588A5_S5_L003_R1_001.fastq.gz,,Vcorymbosum,4
+sample,fastq_1,fastq_2,species,ploidy,outgroup
+CONTROL_REP1,AEG588A1_S1_L002_R1_001.fastq.gz,AEG588A1_S1_L002_R2_001.fastq.gz,Vdarrowii,2,0
+CONTROL_REP2,AEG588A2_S2_L002_R1_001.fastq.gz,AEG588A2_S2_L002_R2_001.fastq.gz,Vdarrowii,2,0
+TREATMENT_REP1,AEG588A4_S4_L003_R1_001.fastq.gz,,Vcorymbosum,4,1
+TREATMENT_REP2,AEG588A5_S5_L003_R1_001.fastq.gz,,Vcorymbosum,4,1
 ```
 
 An [example samplesheet](../assets/samplesheet.csv) ships with the pipeline.
@@ -177,6 +178,98 @@ nextflow run tileylab/pgp \
 ```
 
 When `--skip_markduplicates` is enabled, the workflow sends `SAMTOOLS_VIEW`-filtered BAMs directly to HaplotypeCaller after indexing, instead of running `PICARD_MARKDUPLICATES`.
+
+## Hard filtering strategy
+
+Variant filtering runs in two stages after joint genotyping. Both stages are driven entirely by `ext.args` in [`conf/modules.config`](../conf/modules.config), so any threshold or flag can be changed in one place (see [Tuning filters](#tuning-filters-via-extargs) below).
+
+### Stage 1 — GATK best-practice hard filters
+
+The multi-sample VCF from `GATK4_GENOTYPEGVCFS` is filtered following GATK best practices:
+
+- `SELECT_ALL` keeps SNPs only (`--select-type-to-include SNP --exclude-filtered`) → `*.snps.vcf.gz`
+- `GATK4_VARIANTFILTRATION` annotates the `FILTER` column for sites failing any threshold below (nothing is dropped yet) → `*.snps.annotations.vcf.gz`
+- `SELECT_PASS` keeps only `PASS` sites (`--select-type-to-include SNP --exclude-filtered`) → `*.snps.gatkfilters.vcf.gz` — **this is the input to the VCFtools stage**
+- `SELECT_BIPASS` additionally restricts to biallelic SNPs → `*.biallelic.gatkfilters.vcf.gz`
+
+| Filter expression       | Flag name             | Annotation               |
+| ----------------------- | --------------------- | ------------------------ |
+| `FS > 60.0`             | `FS_gt60`             | Fisher strand bias       |
+| `MQ < 40.0`             | `MQ_lt40`             | RMS mapping quality      |
+| `ReadPosRankSum < -8.0` | `ReadPosRankSum_ltm8` | read-position rank-sum   |
+| `MQRankSum < -12.5`     | `MQRS_ltm12p5`        | mapping-quality rank-sum |
+| `QD < 2.0`              | `QD_lt2`              | quality by depth         |
+| `SOR > 3.0`             | `SOR_gt3`             | strand odds ratio        |
+
+These expressions live in the `GATK4_VARIANTFILTRATION` block of `conf/modules.config` and are **not** exposed as `--params`; change them there or override `ext.args` with `-c`.
+
+### Stage 2 — VCFtools iterative filtering
+
+Starting from the `PASS`-only `*.snps.gatkfilters` VCF, a chain of single-task VCFtools processes applies, in order:
+
+1. `VCF_MINDP` — site mean-depth floor (`--min-meanDP`)
+2. three rounds alternating `VCF_SITE_1..3` (site `--max-missing`) with `VCF_RMINDV_1..3` (drop individuals whose `F_MISS` exceeds the round's cutoff)
+3. `VCFTOOLS_DEPTH_OUTLIER` — high-depth outlier cut at `mean + N·SD`
+4. optional `VCF_FINAL` (a final `--max-missing`, only when `--vcf_max_missing_final` is set)
+5. `VCF_RMFILTERED` (`--remove-filtered-all`) → the cleaned VCF
+6. analysis subsets from the cleaned VCF: `VCF_BIALLELIC`, `VCF_MAC`, `VCF_THIN`, and `VCF_INGROUP` (drops samples flagged `outgroup=1`)
+
+Compressed, tabix-indexed products (`.vcf.gz` + `.vcf.gz.tbi`) land in `results/vcftools/`. `results/vcftools/reports/` holds the per-round `*.imiss` missingness tables and `*.remove.txt` removal lists, plus `vcftools_filtering_summary.tsv` — a per-stage table of how many SNPs and individuals survive. That summary is also rendered in the MultiQC report as a **VCFtools filtering** section (a table plus SNP/individual trend bargraphs). Ingroup-only products (`*.ingroup.biallelic.vcf.gz`) are produced only when at least one sample is flagged `outgroup=1`.
+
+The common VCFtools thresholds are exposed as params for convenience:
+
+| Param                     | Default       | Description                                                                    |
+| ------------------------- | ------------- | ------------------------------------------------------------------------------ |
+| `--skip_vcftools`         | `false`       | Skip the whole VCFtools stage.                                                 |
+| `--vcf_min_meandp`        | `5`           | Initial site mean-depth floor (`--min-meanDP`).                                |
+| `--vcf_site_missing`      | `0.5,0.4,0.3` | Comma-separated site `--max-missing` schedule (one value per round).           |
+| `--vcf_indiv_missing`     | `0.9,0.7,0.5` | Per-round individual `F_MISS` removal cutoffs (paired with the site schedule). |
+| `--vcf_depth_sd`          | `2`           | `--max-meanDP` = mean + N·SD of site mean depth.                               |
+| `--vcf_max_missing_final` | _(unset)_     | Optional final `--max-missing` after the depth cut.                            |
+| `--vcf_mac`               | `3`           | `--mac` for the biallelic subset.                                              |
+| `--vcf_thin`              | `10000`       | `--thin` for the biallelic subset.                                             |
+
+### Tuning filters via `ext.args`
+
+Every per-process flag set lives in a `withName:` block in [`conf/modules.config`](../conf/modules.config). The VCFtools thresholds are wired to the `--vcf_*` params through `ext.args` closures, for example:
+
+```groovy
+withName: VCF_SITE_1 { ext.args = { "--max-missing ${params.vcf_site_missing.tokenize(',')[0]}" } }
+withName: VCF_MAC    { ext.args = { "--mac ${params.vcf_mac}" } }
+```
+
+There are two ways to change filtering behaviour:
+
+- **Adjust an exposed threshold** — set the relevant param on the command line or in a `-params-file`:
+
+  ```bash
+  nextflow run tileylab/pgp ... --vcf_mac 5 --vcf_site_missing 0.6,0.5,0.4 --vcf_min_meandp 8
+  ```
+
+- **Change the actual flags** — for options that aren't param-exposed (the GATK filter expressions, or adding/swapping a VCFtools flag), override the process `ext.args` in a custom config passed with `-c`:
+
+  ```groovy
+  // my_filters.config
+  process {
+      withName: GATK4_VARIANTFILTRATION {
+          ext.args = [
+              '--filter-expression "QD < 3.0"  --filter-name "QD_lt3"',
+              '--filter-expression "FS > 50.0" --filter-name "FS_gt50"',
+              '--filter-expression "MQ < 40.0" --filter-name "MQ_lt40"'
+          ].join(' ')
+      }
+      withName: VCF_THIN { ext.args = '--thin 5000' }
+  }
+  ```
+
+  ```bash
+  nextflow run tileylab/pgp -profile docker -c my_filters.config --input ... --outdir ...
+  ```
+
+  A `-c` override wins over the in-repo `conf/modules.config`, so you can re-tune filters without editing the pipeline.
+
+> [!NOTE]
+> The missingness loop is fixed at three rounds (`VCF_SITE_1..3` / `VCF_RMINDV_1..3`), so `--vcf_site_missing` and `--vcf_indiv_missing` must each carry three comma-separated values. Changing the _number_ of rounds is a `workflows/pgp.nf` edit, not a config change.
 
 ### Resource requests
 

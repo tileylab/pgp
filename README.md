@@ -31,23 +31,24 @@ Development of **tileylab/pgp** borrowed heavily from [sarek](https://github.com
 
 ### Samplesheet
 
-The pipeline takes a comma-separated samplesheet with one row per sample and the following five columns (all required except `fastq_2`, which may be empty for single-end data):
+The pipeline takes a comma-separated samplesheet with one row per sample and the following six columns (all required except `fastq_2`, which may be empty for single-end data):
 
-| Column    | Type    | Description                                                                                         |
-| --------- | ------- | --------------------------------------------------------------------------------------------------- |
-| `sample`  | string  | Sample identifier. Must be unique and cannot contain spaces. Becomes the `meta.id` in the workflow. |
-| `fastq_1` | path    | Path to gzipped FASTQ file for read 1 (`.fastq.gz` or `.fq.gz`).                                    |
-| `fastq_2` | path    | Path to gzipped FASTQ file for read 2. Leave empty for single-end libraries.                        |
-| `species` | string  | Species, population, or other grouping label. No spaces.                                            |
-| `ploidy`  | integer | Sample ploidy (positive integer). Currently informational; reserved for upcoming polyploid models.  |
+| Column     | Type    | Description                                                                                              |
+| ---------- | ------- | -------------------------------------------------------------------------------------------------------- |
+| `sample`   | string  | Sample identifier. Must be unique and cannot contain spaces. Becomes the `meta.id` in the workflow.      |
+| `fastq_1`  | path    | Path to gzipped FASTQ file for read 1 (`.fastq.gz` or `.fq.gz`).                                         |
+| `fastq_2`  | path    | Path to gzipped FASTQ file for read 2. Leave empty for single-end libraries.                             |
+| `species`  | string  | Species, population, or other grouping label. No spaces.                                                 |
+| `ploidy`   | integer | Sample ploidy (positive integer). Currently informational; reserved for upcoming polyploid models.       |
+| `outgroup` | integer | `0` for ingroup, `1` for outgroup. Outgroup samples are dropped from the ingroup-only VCFtools products. |
 
 `samplesheet.csv`:
 
 ```csv
-sample,fastq_1,fastq_2,species,ploidy
-SRR19908723,data/SRR19908723.R1.fastq.gz,data/SRR19908723.R2.fastq.gz,Vdarrowii,2
-SRR19908722,data/SRR19908722.R1.fastq.gz,data/SRR19908722.R2.fastq.gz,Vdarrowii,2
-SRR19908705,data/SRR19908705.R1.fastq.gz,data/SRR19908705.R2.fastq.gz,Vdarrowii,2
+sample,fastq_1,fastq_2,species,ploidy,outgroup
+SRR19908723,data/SRR19908723.R1.fastq.gz,data/SRR19908723.R2.fastq.gz,Vdarrowii,2,0
+SRR19908722,data/SRR19908722.R1.fastq.gz,data/SRR19908722.R2.fastq.gz,Vdarrowii,2,0
+SRR19908705,data/SRR19908705.R1.fastq.gz,data/SRR19908705.R2.fastq.gz,Vdarrowii,2,1
 ```
 
 Relative paths are acceptable when the Nextflow launch directory is the parent of `data/`; otherwise use absolute paths. See [`assets/samplesheet.csv`](assets/samplesheet.csv) and [`assets/schema_input.json`](assets/schema_input.json) for the canonical template and validation rules.
@@ -104,6 +105,15 @@ A few things are baked into `conf/modules.config` rather than exposed as flags:
 - Only properly paired reads with mapping quality ≥ 20 are retained for genotyping (`samtools view -b -q 20 -f 2 -F 4`).
 - Per-process CPU and memory overrides live in `conf/modules.config` (kept here so module `main.nf` files stay lint-clean).
 - `HaplotypeCaller` runs in `GVCF` mode. Switch to `BP_RESOLUTION` there if you need per-site genotype information (e.g. to distinguish invariant from data-deficient).
+
+### Hard filtering strategy
+
+Variant filtering runs in two stages after joint genotyping, both configured through `ext.args` in [`conf/modules.config`](conf/modules.config):
+
+1. **GATK best-practice hard filters** — `GATK4_VARIANTFILTRATION` flags SNPs failing standard thresholds (`FS > 60`, `MQ < 40`, `ReadPosRankSum < -8`, `MQRankSum < -12.5`, `QD < 2`, `SOR > 3`) and `SELECT_PASS` keeps the `PASS` sites (`*.snps.gatkfilters.vcf.gz`).
+2. **VCFtools iterative filtering** — a chain of single-task processes applies a mean-depth floor, three alternating rounds of site-missingness (`--max-missing`) and individual-missingness removal, a high-depth outlier cut, then biallelic / MAC / thin / ingroup subsets. Per-stage SNP and individual counts are reported in `results/vcftools/reports/vcftools_filtering_summary.tsv` and the MultiQC report.
+
+The VCFtools thresholds are exposed as `--vcf_*` parameters (e.g. `--vcf_mac`, `--vcf_site_missing`); the GATK expressions and any other flag are changed by overriding the relevant process `ext.args` in `conf/modules.config` or a `-c` config. See [`docs/usage.md`](docs/usage.md#hard-filtering-strategy) for the full strategy and worked `ext.args` examples.
 
 ## Credits
 

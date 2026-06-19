@@ -33,6 +33,24 @@ include { SAMTOOLS_INDEX } from '../modules/nf-core/samtools/index/main'
 include { SAMTOOLS_INDEX as SAMTOOLS_INDEX_PASSDUPS } from '../modules/nf-core/samtools/index/main'
 include { SAMTOOLS_VIEW } from '../modules/nf-core/samtools/view/main'
 
+// VCFtools iterative filtering — single-task processes chained with aliases
+include { VCFTOOLS_RECODE as VCF_MINDP        } from '../modules/local/vcftools/recode/main'
+include { VCFTOOLS_RECODE as VCF_SITE_1       } from '../modules/local/vcftools/recode/main'
+include { VCFTOOLS_RECODE as VCF_SITE_2       } from '../modules/local/vcftools/recode/main'
+include { VCFTOOLS_RECODE as VCF_SITE_3       } from '../modules/local/vcftools/recode/main'
+include { VCFTOOLS_RECODE as VCF_FINAL        } from '../modules/local/vcftools/recode/main'
+include { VCFTOOLS_RECODE as VCF_RMFILTERED   } from '../modules/local/vcftools/recode/main'
+include { VCFTOOLS_RECODE as VCF_BIALLELIC    } from '../modules/local/vcftools/recode/main'
+include { VCFTOOLS_RECODE as VCF_MAC          } from '../modules/local/vcftools/recode/main'
+include { VCFTOOLS_RECODE as VCF_THIN         } from '../modules/local/vcftools/recode/main'
+include { VCFTOOLS_RECODE as VCF_INGROUP      } from '../modules/local/vcftools/recode/main'
+include { VCFTOOLS_MISSING_INDV as VCF_RMINDV_1 } from '../modules/local/vcftools/missingindv/main'
+include { VCFTOOLS_MISSING_INDV as VCF_RMINDV_2 } from '../modules/local/vcftools/missingindv/main'
+include { VCFTOOLS_MISSING_INDV as VCF_RMINDV_3 } from '../modules/local/vcftools/missingindv/main'
+include { VCFTOOLS_DEPTH_OUTLIER              } from '../modules/local/vcftools/depthoutlier/main'
+include { VCFTOOLS_SUMMARY                    } from '../modules/local/vcftools/summary/main'
+include { BGZIP_TABIX } from '../modules/local/bgzip_tabix/main'
+
 // Subworkflows added from nf-core
 include { BAM_STATS_SAMTOOLS } from '../subworkflows/nf-core/bam_stats_samtools/main'
 
@@ -324,6 +342,86 @@ NOTE: Not bothering with splitting on intervals since the microbial genomes are 
         meta, vcf, tbi -> [meta, vcf, tbi]
     }
     //bipass_vcf_tbi.view()
+
+    /*
+        Iterative VCFtools filtering of the joint VCF, decomposed into single-task
+        processes chained with aliases (mirrors the SELECT_* pattern). Operates on
+        the .snps.gatkfilters joint VCF (SELECT_PASS). Thresholds are tuned via the
+        vcf_* params; outgroups are flagged in the samplesheet (outgroup column).
+        Each stage's VCF is collected for the per-stage summary.
+    */
+    // Outgroup sample IDs (empty channel when no sample is flagged -> ingroup step is skipped)
+    ch_outgroups = ch_samplesheet
+        .filter { meta, reads -> (meta.outgroup as Integer) == 1 }
+        .map    { meta, reads -> meta.id }
+        .collectFile(name: 'outgroups.txt', newLine: true)
+
+    ch_stages = channel.empty()
+
+    // Seed: mean-depth floor
+    VCF_MINDP ( pass_vcf_tbi.map { meta, vcf, tbi -> [ meta, vcf ] }, [] )
+    ch_stages = ch_stages.mix(VCF_MINDP.out.vcf.map { meta, vcf -> [ meta, '01_min_meanDP', vcf ] })
+
+    // Iterative site/individual missingness rounds
+    VCF_SITE_1   ( VCF_MINDP.out.vcf, [] )
+    ch_stages = ch_stages.mix(VCF_SITE_1.out.vcf.map { meta, vcf -> [ meta, '02_site_1', vcf ] })
+    VCF_RMINDV_1 ( VCF_SITE_1.out.vcf )
+    ch_stages = ch_stages.mix(VCF_RMINDV_1.out.vcf.map { meta, vcf -> [ meta, '03_indiv_1', vcf ] })
+
+    VCF_SITE_2   ( VCF_RMINDV_1.out.vcf, [] )
+    ch_stages = ch_stages.mix(VCF_SITE_2.out.vcf.map { meta, vcf -> [ meta, '04_site_2', vcf ] })
+    VCF_RMINDV_2 ( VCF_SITE_2.out.vcf )
+    ch_stages = ch_stages.mix(VCF_RMINDV_2.out.vcf.map { meta, vcf -> [ meta, '05_indiv_2', vcf ] })
+
+    VCF_SITE_3   ( VCF_RMINDV_2.out.vcf, [] )
+    ch_stages = ch_stages.mix(VCF_SITE_3.out.vcf.map { meta, vcf -> [ meta, '06_site_3', vcf ] })
+    VCF_RMINDV_3 ( VCF_SITE_3.out.vcf )
+    ch_stages = ch_stages.mix(VCF_RMINDV_3.out.vcf.map { meta, vcf -> [ meta, '07_indiv_3', vcf ] })
+
+    // Depth-outlier cut
+    VCFTOOLS_DEPTH_OUTLIER ( VCF_RMINDV_3.out.vcf )
+    ch_stages = ch_stages.mix(VCFTOOLS_DEPTH_OUTLIER.out.vcf.map { meta, vcf -> [ meta, '08_max_meanDP', vcf ] })
+
+    // Optional final site-missingness pass
+    ch_pre_clean = VCFTOOLS_DEPTH_OUTLIER.out.vcf
+    if (params.vcf_max_missing_final != null) {
+        VCF_FINAL ( VCFTOOLS_DEPTH_OUTLIER.out.vcf, [] )
+        ch_stages = ch_stages.mix(VCF_FINAL.out.vcf.map { meta, vcf -> [ meta, '09_final_max_missing', vcf ] })
+        ch_pre_clean = VCF_FINAL.out.vcf
+    }
+
+    // Cleaned VCF + analysis-ready subsets
+    VCF_RMFILTERED ( ch_pre_clean, [] )
+    ch_stages = ch_stages.mix(VCF_RMFILTERED.out.vcf.map { meta, vcf -> [ meta, '10_filtered', vcf ] })
+
+    VCF_BIALLELIC ( VCF_RMFILTERED.out.vcf, [] )
+    ch_stages = ch_stages.mix(VCF_BIALLELIC.out.vcf.map { meta, vcf -> [ meta, '11_biallelic', vcf ] })
+    VCF_MAC       ( VCF_BIALLELIC.out.vcf, [] )
+    ch_stages = ch_stages.mix(VCF_MAC.out.vcf.map { meta, vcf -> [ meta, '12_biallelic_mac', vcf ] })
+    VCF_THIN      ( VCF_MAC.out.vcf, [] )
+    ch_stages = ch_stages.mix(VCF_THIN.out.vcf.map { meta, vcf -> [ meta, '13_biallelic_mac_thin', vcf ] })
+
+    // Ingroup-only product: channel-driven, runs only when >= 1 outgroup is flagged
+    ch_ingroup_in = VCF_RMFILTERED.out.vcf.combine(ch_outgroups)
+    VCF_INGROUP (
+        ch_ingroup_in.map { meta, vcf, og -> [ meta, vcf ] },
+        ch_ingroup_in.map { meta, vcf, og -> og }
+    )
+    ch_stages = ch_stages.mix(VCF_INGROUP.out.vcf.map { meta, vcf -> [ meta, '14_ingroup', vcf ] })
+
+    // Per-stage SNP/individual summary + MultiQC content (00_input = the raw joint VCF)
+    ch_stages = ch_stages.mix(pass_vcf_tbi.map { meta, vcf, tbi -> [ meta, '00_input', vcf ] })
+    ch_summary = ch_stages
+        .toSortedList { a, b -> a[1] <=> b[1] }
+        .map { rows -> tuple(rows[0][0], rows.collect { it[1] }, rows.collect { it[2] }) }
+    VCFTOOLS_SUMMARY ( ch_summary )
+    ch_multiqc_files = ch_multiqc_files.mix(VCFTOOLS_SUMMARY.out.mqc.flatten())
+
+    // Compress + index the final products
+    ch_products = VCF_RMFILTERED.out.vcf
+        .mix(VCF_BIALLELIC.out.vcf, VCF_MAC.out.vcf, VCF_THIN.out.vcf, VCF_INGROUP.out.vcf)
+        .groupTuple()
+    BGZIP_TABIX ( ch_products )
 
     //
     // Collate and save software versions

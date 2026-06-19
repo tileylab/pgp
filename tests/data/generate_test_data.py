@@ -143,10 +143,13 @@ def main():
 
     # Generate samplesheet (relative paths — nf-schema resolves them relative to samplesheet location)
     samplesheet_path = os.path.join(SCRIPT_DIR, "samplesheet.csv")
+    # sample2 is flagged as an outgroup (1) to exercise the ingroup-only products
+    outgroup_flags = {"sample1": 0, "sample2": 1}
     with open(samplesheet_path, "w") as f:
-        f.write("sample,fastq_1,fastq_2,species,ploidy\n")
+        f.write("sample,fastq_1,fastq_2,species,ploidy,outgroup\n")
         for sample in SAMPLE_SNPS:
-            f.write(f"{sample},{sample}_R1.fastq.gz,{sample}_R2.fastq.gz,test_species,2\n")
+            og = outgroup_flags.get(sample, 0)
+            f.write(f"{sample},{sample}_R1.fastq.gz,{sample}_R2.fastq.gz,test_species,2,{og}\n")
     print(f"Wrote {samplesheet_path}")
 
 

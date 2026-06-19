@@ -20,7 +20,7 @@
                     "mimetype": "text/csv",
                     "pattern": "^\\S+\\.csv$",
                     "description": "Path to comma-separated file containing information about the samples in the experiment.",
-                    "help_text": "Use this parameter to specify the path to the samplesheet describing your samples. It must be a comma-separated file with a header row and 5 columns: `sample`, `fastq_1`, `fastq_2`, `species`, `ploidy`. `fastq_2` may be empty for single-end data; all other columns are required.",
+                    "help_text": "Use this parameter to specify the path to the samplesheet describing your samples. It must be a comma-separated file with a header row and 6 columns: `sample`, `fastq_1`, `fastq_2`, `species`, `ploidy`, `outgroup`. `fastq_2` may be empty for single-end data; `outgroup` is 0 (ingroup) or 1 (outgroup). All other columns are required.",
                     "fa_icon": "fas fa-file-csv"
                 },
                 "outdir": {
@@ -68,6 +68,52 @@
                     "description": "Path to intervals for reference genome",
                     "help_text": "This parameter is needed. A interval file can be prepared in advance with bin/prepare_intervals.py",
                     "fa_icon": "far fa-file-code"
+                }
+            }
+        },
+        "vcftools_filtering": {
+            "title": "VCFtools filtering",
+            "type": "object",
+            "fa_icon": "fas fa-filter",
+            "description": "Iterative site/individual missingness filtering of the joint VCF with VCFtools.",
+            "properties": {
+                "skip_vcftools": {
+                    "type": "boolean",
+                    "description": "Skip the VCFtools filtering stage entirely."
+                },
+                "vcf_min_meandp": {
+                    "type": "number",
+                    "default": 5,
+                    "description": "Initial site mean-depth floor (vcftools --min-meanDP)."
+                },
+                "vcf_site_missing": {
+                    "type": "string",
+                    "default": "0.5,0.4,0.3",
+                    "description": "Comma-separated site --max-missing schedule, paired round-by-round with vcf_indiv_missing."
+                },
+                "vcf_indiv_missing": {
+                    "type": "string",
+                    "default": "0.9,0.7,0.5",
+                    "description": "Comma-separated per-round individual F_MISS removal cutoffs (individuals above the cutoff are dropped)."
+                },
+                "vcf_depth_sd": {
+                    "type": "number",
+                    "default": 2,
+                    "description": "Depth-outlier cut: --max-meanDP is set to mean + this many SDs of site mean depth."
+                },
+                "vcf_max_missing_final": {
+                    "type": "number",
+                    "description": "Optional final site --max-missing applied after the depth-outlier cut. Leave unset to skip."
+                },
+                "vcf_mac": {
+                    "type": "integer",
+                    "default": 3,
+                    "description": "Minor allele count (--mac) for the biallelic phylogeny subset."
+                },
+                "vcf_thin": {
+                    "type": "integer",
+                    "default": 10000,
+                    "description": "Minimum distance between retained sites (--thin) for the biallelic phylogeny subset."
                 }
             }
         },
@@ -200,6 +246,9 @@
         },
         {
             "$ref": "#/$defs/reference_genome_options"
+        },
+        {
+            "$ref": "#/$defs/vcftools_filtering"
         },
         {
             "$ref": "#/$defs/execution_options"
