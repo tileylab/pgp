@@ -1,0 +1,53 @@
+nextflow_pipeline {
+
+    name "Test polyploid genotyping"
+    script "../main.nf"
+    tag "pipeline"
+    tag "genotyping"
+
+    test("Polyploid genotyping (EBG + updog) runs end to end") {
+
+        setup {
+            // Full ingroup cohort (5 tetraploid samples) + 1 outgroup, absolute paths
+            def testDataDir = "${baseDir}/tests/data"
+            def samplesheet = new File("${outputDir}/genotyping_samplesheet.csv")
+            samplesheet.parentFile.mkdirs()
+            samplesheet.text = """\
+sample,fastq_1,fastq_2,species,ploidy,outgroup
+sample1,${testDataDir}/sample1_R1.fastq.gz,${testDataDir}/sample1_R2.fastq.gz,test_species,4,0
+sample2,${testDataDir}/sample2_R1.fastq.gz,${testDataDir}/sample2_R2.fastq.gz,test_species,4,0
+sample3,${testDataDir}/sample3_R1.fastq.gz,${testDataDir}/sample3_R2.fastq.gz,test_species,4,0
+sample4,${testDataDir}/sample4_R1.fastq.gz,${testDataDir}/sample4_R2.fastq.gz,test_species,4,0
+sample5,${testDataDir}/sample5_R1.fastq.gz,${testDataDir}/sample5_R2.fastq.gz,test_species,4,0
+sample6,${testDataDir}/sample6_R1.fastq.gz,${testDataDir}/sample6_R2.fastq.gz,test_species,2,1
+"""
+        }
+
+        when {
+            params {
+                outdir        = "$outputDir"
+                input         = "${outputDir}/genotyping_samplesheet.csv"
+                no_polyploids = false
+            }
+        }
+
+        then {
+            def geno = "${params.outdir}/genotyping"
+            assertAll(
+                { assert workflow.success },
+
+                // EBG ran for the ingroup ploidy group (4)
+                { assert new File("${geno}/ebg/ebg_p4-genos.txt").exists() },
+
+                // updog ran for the same group
+                { assert new File("${geno}/updog/updog_p4.updog.tsv").exists() },
+
+                // Concordance comparison produced both reports, with content
+                { assert new File("${geno}/genotype_concordance.tsv").exists() },
+                { assert new File("${geno}/genotype_concordance_summary.tsv").exists() },
+                { assert new File("${geno}/genotype_concordance.tsv").readLines().size() > 1 },
+                { assert new File("${geno}/genotype_concordance_summary.tsv").text.contains('overall_concordance') }
+            )
+        }
+    }
+}

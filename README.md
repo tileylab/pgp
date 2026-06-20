@@ -12,7 +12,7 @@
 > [!WARNING]
 > This project is not intended for use yet. I am migrating it over from a basic diploid genotype caller workflow and it will take time to iron out the issues.
 
-**tileylab/pgp** is a referenced-based genotyping pipeline. A user provides a reference genome and samplesheet of paired-end Illumina reads. Reads are mapped to the reference with BWA and genotypes called with GATK. Some read quality statisitics are reported along the way and basic hard-filtering performed at the end, but users need to check that filtering is sufficient and appropriate. Candidate variants will eventually be genotyped again under a suite of polyploid models to find a high-confidence set.
+**tileylab/pgp** is a referenced-based genotyping pipeline. A user provides a reference genome and samplesheet of paired-end Illumina reads. Reads are mapped to the reference with BWA and genotypes called with GATK. Some read quality statisitics are reported along the way and basic hard-filtering performed at the end, but users need to check that filtering is sufficient and appropriate. The candidate hard-filtered variants are then genotyped under polyploid models with [EBG](https://github.com/pblischak/polyploid-genotyping) and [updog](https://github.com/dcgerard/updog) — using each sample's ploidy from the samplesheet — and the two methods are compared to find where they agree and disagree (disable with `--no_polyploids` for ordinary diploid genotyping). See [docs/usage.md](docs/usage.md#polyploid-genotyping-ebg--updog).
 
 ### Some simplifying assumtions
 

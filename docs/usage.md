@@ -271,6 +271,48 @@ There are two ways to change filtering behaviour:
 > [!NOTE]
 > The missingness loop is fixed at three rounds (`VCF_SITE_1..3` / `VCF_RMINDV_1..3`), so `--vcf_site_missing` and `--vcf_indiv_missing` must each carry three comma-separated values. Changing the _number_ of rounds is a `workflows/pgp.nf` edit, not a config change.
 
+## Polyploid genotyping (EBG + updog)
+
+The candidate biallelic SNP set (ingroup, before MAC filtering and thinning) is genotyped under two polyploid models — [EBG](https://github.com/pblischak/polyploid-genotyping) and [updog](https://github.com/dcgerard/updog) — and the two are compared. Each sample's `ploidy` comes from the samplesheet; samples are **grouped by ploidy** and EBG (`diseq`) and updog are run once per ploidy group, so mixed-ploidy cohorts are supported. A single per-locus sequencing-error vector (a `samtools mpileup` over the ingroup BAMs, converted to mean Phred error) is shared across groups and fed to EBG.
+
+Disable the stage with `--no_polyploids` to run only the standard front end (mapping → GATK → hard filtering) for ordinary diploid genotyping.
+
+| Param             | Default | Description                                                                                   |
+| ----------------- | ------- | --------------------------------------------------------------------------------------------- |
+| `--no_polyploids` | `false` | Skip EBG/updog genotyping (diploid front end only).                                           |
+| `--ebg_model`     | `diseq` | EBG model: `diseq` (H-W disequilibrium) or `hwe`.                                             |
+| `--ebg_iters`     | `1000`  | EBG ECM iterations.                                                                           |
+| `--updog_model`   | `norm`  | updog prior model (see `updog::multidog`: `norm`, `hw`, `bb`, `s1`, `f1`, `flex`, `uniform`). |
+
+Outputs land under `results/genotyping/`: `ebg/` and `updog/` hold the per-ploidy dosage calls, and `genotype_concordance.tsv` + `genotype_concordance_summary.tsv` report where the two methods agree and disagree. EBG reports ALT-allele dosage and updog reports reference-allele dosage; the comparison harmonises both to ALT dosage before scoring agreement.
+
+#### Tuning EBG and updog via `ext.args`
+
+The common options are param-exposed (`--ebg_model`, `--ebg_iters`, `--updog_model`). For anything else, both genotyping modules accept an `ext.args` pass-through — set it in a `-c` config exactly like the GATK/VCFtools steps:
+
+```groovy
+// my_genotyping.config
+process {
+    // Extra flags appended to the `ebg <model>` command (see `ebg diseq --help`)
+    withName: EBG_DISEQ {
+        ext.args = '--tol 1e-12 --stop 1e-6'
+    }
+    // Extra named arguments forwarded to updog::multidog (R name = value, comma-separated)
+    withName: UPDOG {
+        ext.args = 'seq = 0.01, update_bias = FALSE'
+    }
+}
+```
+
+```bash
+nextflow run tileylab/pgp -profile docker -c my_genotyping.config --input ... --outdir ...
+```
+
+EBG's `ext.args` are inserted before `--prefix` (the `-n/-l/-p/-t/-a/-e` flags are managed by the module); updog's `ext.args` are parsed as R named arguments and passed to `multidog` via `do.call`, so any [`multidog`](https://dcgerard.github.io/updog/reference/multidog.html) argument (`seq`, `bias_init`, `prior_vec`, `update_bias`, …) can be set without editing the pipeline.
+
+> [!NOTE]
+> The genotyping images (`gptiley/ebg`, `gptiley/updog`) must contain `procps` (the `ps` command), which Nextflow uses to collect per-task metrics. The pinned images already do — if you swap in a different genotyping container, make sure it includes `procps`, or the process fails immediately with "Command 'ps' required by nextflow … cannot be found".
+
 ### Resource requests
 
 Whilst the default requirements set within the pipeline will hopefully work for most people and with most input data, you may find that you want to customise the compute resources that the pipeline requests. Each step in the pipeline has a default set of requirements for number of CPUs, memory, and time. Per-process overrides live in `conf/modules.config`; default per-label resources live in `conf/base.config`. Failed jobs are automatically resubmitted with higher resources (2x then 3x) on retryable exit codes.

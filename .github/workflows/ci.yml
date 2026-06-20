@@ -18,8 +18,15 @@ env:
 
 jobs:
   nf-test:
-    name: nf-test | docker
+    name: nf-test | ${{ matrix.name }}
     runs-on: ubuntu-latest
+    timeout-minutes: 60
+    strategy:
+      fail-fast: false
+      matrix:
+        include:
+          - { name: default, path: tests/default.nf.test }
+          - { name: genotyping, path: tests/genotyping.nf.test }
     steps:
       - uses: actions/checkout@v5
 
@@ -39,4 +46,4 @@ jobs:
           sudo mv nf-test /usr/local/bin/
 
       - name: Run nf-test
-        run: nf-test test tests/default.nf.test --profile +docker --verbose
+        run: nf-test test ${{ matrix.path }} --profile +docker --verbose

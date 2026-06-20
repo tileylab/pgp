@@ -51,6 +51,9 @@ include { VCFTOOLS_DEPTH_OUTLIER              } from '../modules/local/vcftools/
 include { VCFTOOLS_SUMMARY                    } from '../modules/local/vcftools/summary/main'
 include { BGZIP_TABIX } from '../modules/local/bgzip_tabix/main'
 
+// Polyploid genotyping (EBG + updog) with an EBG-vs-updog concordance comparison
+include { POLYPLOID_GENOTYPING } from '../subworkflows/local/polyploid_genotyping/main'
+
 // Subworkflows added from nf-core
 include { BAM_STATS_SAMTOOLS } from '../subworkflows/nf-core/bam_stats_samtools/main'
 
@@ -422,6 +425,37 @@ NOTE: Not bothering with splitting on intervals since the microbial genomes are 
         .mix(VCF_BIALLELIC.out.vcf, VCF_MAC.out.vcf, VCF_THIN.out.vcf, VCF_INGROUP.out.vcf)
         .groupTuple()
     BGZIP_TABIX ( ch_products )
+
+    /*
+        Polyploid genotyping (EBG + updog) on the candidate biallelic SNP set
+        (ingroup, pre-MAC/thin). Samples are grouped by samplesheet ploidy.
+        Disabled with --no_polyploids (runs only the standard diploid front end).
+    */
+    if (!params.no_polyploids) {
+        // Candidate VCF: ingroup-biallelic when outgroups are flagged, else biallelic
+        ch_candidate = VCF_INGROUP.out.vcf.concat(VCF_BIALLELIC.out.vcf).first()
+
+        // Ingroup samples (outgroup == 0): ploidy map, distinct ploidies, BAMs
+        ch_ingroup_sheet = ch_samplesheet.filter { meta, reads -> (meta.outgroup as Integer) == 0 }
+        ch_ploidy_map = ch_ingroup_sheet
+            .map { meta, reads -> "${meta.id}\t${meta.ploidy}" }
+            .collectFile(name: 'sample_ploidy.tsv', newLine: true)
+        ch_ploidies = ch_ingroup_sheet.map { meta, reads -> (meta.ploidy as Integer) }.unique()
+
+        ch_ingroup_bb   = ch_bam_bai_marked.filter { meta, bam, bai -> (meta.outgroup as Integer) == 0 }
+        ch_ingroup_bams = ch_ingroup_bb.map { meta, bam, bai -> bam }.collect()
+        ch_ingroup_bais = ch_ingroup_bb.map { meta, bam, bai -> bai }.collect()
+
+        POLYPLOID_GENOTYPING (
+            ch_candidate,
+            ch_ingroup_bams,
+            ch_ingroup_bais,
+            ch_reference.first(),
+            reference_faidx.map { meta, fai -> fai },
+            ch_ploidy_map,
+            ch_ploidies
+        )
+    }
 
     //
     // Collate and save software versions

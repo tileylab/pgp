@@ -117,6 +117,34 @@
                 }
             }
         },
+        "polyploid_genotyping": {
+            "title": "Polyploid genotyping",
+            "type": "object",
+            "fa_icon": "fas fa-dna",
+            "description": "Genotype the candidate biallelic SNP set with EBG and updog, grouped by samplesheet ploidy.",
+            "properties": {
+                "no_polyploids": {
+                    "type": "boolean",
+                    "description": "Skip the EBG/updog polyploid genotyping stage. The standard front end (mapping, GATK, hard filtering) still runs for ordinary diploid genotyping."
+                },
+                "ebg_model": {
+                    "type": "string",
+                    "default": "diseq",
+                    "enum": ["diseq", "hwe"],
+                    "description": "EBG genotype model: 'diseq' (Hardy-Weinberg disequilibrium) or 'hwe'."
+                },
+                "ebg_iters": {
+                    "type": "integer",
+                    "default": 1000,
+                    "description": "Number of ECM iterations for EBG."
+                },
+                "updog_model": {
+                    "type": "string",
+                    "default": "norm",
+                    "description": "updog prior genotype-distribution model (see updog::multidog; e.g. norm, hw, bb, s1, f1, flex, uniform)."
+                }
+            }
+        },
         "execution_options": {
             "title": "Execution options",
             "type": "object",
@@ -249,6 +277,9 @@
         },
         {
             "$ref": "#/$defs/vcftools_filtering"
+        },
+        {
+            "$ref": "#/$defs/polyploid_genotyping"
         },
         {
             "$ref": "#/$defs/execution_options"

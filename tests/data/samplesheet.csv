@@ -1,3 +1,7 @@
 sample,fastq_1,fastq_2,species,ploidy,outgroup
-sample1,sample1_R1.fastq.gz,sample1_R2.fastq.gz,test_species,2,0
-sample2,sample2_R1.fastq.gz,sample2_R2.fastq.gz,test_species,2,1
+sample1,sample1_R1.fastq.gz,sample1_R2.fastq.gz,test_species,4,0
+sample2,sample2_R1.fastq.gz,sample2_R2.fastq.gz,test_species,4,0
+sample3,sample3_R1.fastq.gz,sample3_R2.fastq.gz,test_species,4,0
+sample4,sample4_R1.fastq.gz,sample4_R2.fastq.gz,test_species,4,0
+sample5,sample5_R1.fastq.gz,sample5_R2.fastq.gz,test_species,4,0
+sample6,sample6_R1.fastq.gz,sample6_R2.fastq.gz,test_species,2,1

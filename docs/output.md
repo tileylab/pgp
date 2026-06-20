@@ -90,6 +90,21 @@ The GATK filter expressions (FS, MQ, ReadPosRankSum, MQRankSum, QD, SOR) are lis
 
 The per-stage `vcftools_filtering_summary.tsv` is also rendered in the MultiQC report (a **VCFtools filtering** table plus SNP/individual trend bargraphs). The thresholds are tunable — see [usage.md](usage.md#stage-2--vcftools-iterative-filtering).
 
+### Polyploid genotyping
+
+<details markdown="1">
+<summary>Output files</summary>
+
+- `genotyping/ebg/` — `ebg_p<ploidy>-genos.txt` (ALT-allele dosage calls), `ebg_p<ploidy>-PL.txt`, `ebg_p<ploidy>-freqs.txt` per ploidy group.
+- `genotyping/updog/` — `updog_p<ploidy>.updog.tsv` (per SNP × individual reference-allele dosage) per ploidy group.
+- `genotyping/`
+  - `genotype_concordance.tsv` — per SNP × individual, both calls (harmonised to ALT dosage) and an agreement flag.
+  - `genotype_concordance_summary.tsv` — overall, per-ploidy and per-dosage-class agreement rates plus the most discordant SNPs.
+
+</details>
+
+The candidate biallelic SNP set is genotyped with [EBG](https://github.com/pblischak/polyploid-genotyping) (`diseq`) and [updog](https://github.com/dcgerard/updog), grouped by samplesheet ploidy, and the two are compared. Skip the stage with `--no_polyploids`. See [usage.md](usage.md#polyploid-genotyping-ebg--updog).
+
 ### MultiQC
 
 <details markdown="1">

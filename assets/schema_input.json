@@ -35,7 +35,8 @@
             "ploidy": {
                 "type": "integer",
                 "pattern": "^\\d+$",
-                "errorMessage": "Ploidy must be a positive integer."
+                "errorMessage": "Ploidy must be a positive integer.",
+                "meta": ["ploidy"]
             },
             "outgroup": {
                 "type": "integer",
